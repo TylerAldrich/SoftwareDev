@@ -8,7 +8,7 @@ Step 3: ???
 Step 4: Prophet
 
 # Git usage
-When making changes, start with 'git checkout -b INITIALS\_description\_of\_thing\_being\_worked\_on'
+When making changes, start with 'git checkout -b INITIALS_description_of_thing_being_worked_on'
     ex: 'git checkout -b TA_create_setup_docs'
 
 To switch between git branchs A and B:
@@ -25,6 +25,7 @@ To commit changes:
     Type 'git status' to see which files are staged for commit and make sure its correct.
     Once all the files have been staged for commit, type 'git commit -m HELPFUL MESSAGE HERE'
         (Make sure your message is actually helpful...)
+    Type 'git push origin YOUR_BRANCH_NAME' to push the changes of your branch to the remote repository
 
 To update your branch (master or a feature branch) to the newest remote code:
     'git pull origin master' on the branch you want to update. It's best to run this frequently so that you
