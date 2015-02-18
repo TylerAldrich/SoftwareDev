@@ -17,9 +17,9 @@ ex: `$ git checkout -b TA_create_setup_docs`
 
 To switch between git branchs A and B:
 
-```$ git checkout A' will switch to A```
+`$ git checkout A` will switch to A
 
-```$ git checkout B' will switch to B```
+`$ git checkout B' will switch to B
 
 Any uncommited changes will get carried into the checked out branch, so if you dont want this to happen you can either commit the changes (if they are ready
 to be commited), or you can stash them with `$ git stash`, and later retreive with:
