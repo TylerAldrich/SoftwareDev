@@ -27,11 +27,11 @@ to be commited), or you can stash them with `$ git stash`, and later retreive wi
 
 To commit changes: 
 
-*Add your changes to be staged for commit with 'git add X', where X = name of the file you changed. (To add all files in your current directory, you can do 'git add .')
+* Add your changes to be staged for commit with 'git add X', where X = name of the file you changed. (To add all files in your current directory, you can do 'git add .')
 
-*Type 'git status' to see which files are staged for commit and make sure its correct.
+* Type 'git status' to see which files are staged for commit and make sure its correct.
 
-*Once all the files have been staged for commit, type `$ git commit -m HELPFUL MESSAGE HERE` (Make sure your message is actually helpful...)
+* Once all the files have been staged for commit, type `$ git commit -m HELPFUL MESSAGE HERE` (Make sure your message is actually helpful...)
 
 Type `$ git push origin YOUR_BRANCH_NAME` to push the changes of your branch to the remote repository
 
