@@ -11,11 +11,11 @@ Step 3: ???
 Step 4: Prophet
 
 # Git usage
-When making changes, start with `$ git checkout -b INITIALS_description_of_thing_being_worked_on`
+When making changes, start with `$ git checkout -b INITIALS_STORY_NUMBER`
 
-ex: `$ git checkout -b TA_create_setup_docs`
+ex: `$ git checkout -b TA_BACK018`
 
-To switch between git branchs A and B:
+To switch between git branches A and B:
 
 `$ git checkout A` will switch to A
 
@@ -43,6 +43,11 @@ To update your branch (master or a feature branch) to the newest remote code:
 # Merging code into Master
 Once you're ready to merge your branch into the master branch (where only completed/working features live), go to the github repository, find your branch, and select 'Create Pull Request'.
 
-Name the Pull Request (PR) something that describes what you've done, and send it to someone else in the group
-for code review. This gives other people a chance to see what's being added to the codebase, so everybody has 
+Name the Pull Request (PR) something that describes what you've done. Tag someone in your group (Front end / Back end) using an '@' mention. This gives others a chance to see what's being added to the codebase, so everybody has 
 a good idea about what's going on and what changes have been made.
+
+# Style
+Code should follow Google's [Python Style Rules](https://google-styleguide.googlecode.com/svn/trunk/pyguide.html#Python_Style_Rules) for uniformity.
+
+# Testing
+All code should be tested using the [Python Unit Testing Framework](https://docs.python.org/2/library/unittest.html).
