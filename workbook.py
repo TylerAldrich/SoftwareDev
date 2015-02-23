@@ -4,7 +4,6 @@ import pprint
 from lookzone import Lookzone
 class Workbook():
     """ Wraps the xlrd Book object """
-
     def __init__(self, workbook_file):
         self.workbook = xlrd.open_workbook(workbook_file)
         self._stat_sheets = []
@@ -22,42 +21,41 @@ class Workbook():
         pass
 
     # Don't think we need this anymore
-    # def generate_contents(self, sheet):
-    #     """ Put the contents of each cell into a dictionary.
-    #         If the cell name is already in the dict, add to a list
-    #         of values for that statistic. """
-    #     # TODO(KingTyler) - Need to keep track of where the values in each
-    #     # list come from (different lookzones)
+    def generate_contents(self, sheet):
+         """ Put the contents of each cell into a dictionary.
+             If the cell name is already in the dict, add to a list
+             of values for that statistic. """
+         # TODO(KingTyler) - Need to keep track of where the values in each
+         # list come from (different lookzones)
+         if sheet.name in self._data_dict:
+            # already generated contents for this sheet
+            return
 
-    #     if sheet.name in self._data_dict:
-    #         # already generated contents for this sheet
-    #         return
+         self._data_dict[sheet.name] = {}
+         data = self._data_dict[sheet.name]
 
-    #     self._data_dict[sheet.name] = {}
-    #     data = self._data_dict[sheet.name]
+         for row_num in xrange(sheet.nrows):
+             row = sheet.row(row_num)
 
-    #     for row_num in xrange(sheet.nrows):
-    #         row = sheet.row(row_num)
+             row_key = None
+             for cell_num in xrange(sheet.ncols):
+                 # Cell Types: 0=Empty, 1=Text, 2=Number, 3=Date
+                 #             4=Boolean, 5=Error, 6=Blank
+                 cell_type = sheet.cell_type(row_num, cell_num)
 
-    #         row_key = None
-    #         for cell_num in xrange(sheet.ncols):
-    #             # Cell Types: 0=Empty, 1=Text, 2=Number, 3=Date
-    #             #             4=Boolean, 5=Error, 6=Blank
-    #             cell_type = sheet.cell_type(row_num, cell_num)
+                 if cell_type == 0: # skip blank rows
+                     continue
 
-    #             if cell_type == 0: # skip blank rows
-    #                 continue
-
-    #             cell_value = sheet.cell_value(row_num, cell_num)
-    #             if cell_type == 1: # add this as row key
-    #                 row_key = cell_value
-    #             if cell_type == 2 and row_key:
-    #                 if row_key in data and not isinstance(data[row_key], list):
-    #                     data[row_key] = [data[row_key], cell_value]
-    #                 elif row_key in data:
-    #                     data[row_key].append(cell_value)
-    #                 else:
-    #                     data[row_key] = cell_value
+                 cell_value = sheet.cell_value(row_num, cell_num)
+                 if cell_type == 1: # add this as row key
+                     row_key = cell_value
+                 if cell_type == 2 and row_key:
+                     if row_key in data and not isinstance(data[row_key], list):
+                         data[row_key] = [data[row_key], cell_value]
+                     elif row_key in data:
+                         data[row_key].append(cell_value)
+                     else:
+                         data[row_key] = cell_value
 
     def get_data(self, sheet):
         """ Returns dictionary of data from the sheet.
