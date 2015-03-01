@@ -16,5 +16,5 @@ if __name__ == '__main__':
 
     stat_sheets = workbook.get_sheets()
     data_dict = workbook.get_data(stat_sheets[0])
-    workbook.write_workbook(filename + ".xls", "Width", "Appears", "Gazepoint count")
-    print "File created: " + filename + ".xls"
+    workbook.write_workbook(filename, "Width", "Appears", "Gazepoint count")
+    print "File created: " + filename

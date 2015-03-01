@@ -1,5 +1,46 @@
 #!/usr/bin/python
 import xlrd
+import unittest
+from workbook import Workbook
 
-workbook = xlrd.open_workbook('sample_inputs/191137- ATT 2 NEG.xlsx')
-print workbook.sheet_names()
+TEST_WORKBOOK_1 = 'sample_inputs/191144- ATT 2 NEG.xlsx'
+TEST_WORKBOOK_2 = 'sample_inputs/191150- ATT 2 NEG.xlsx'
+TEST_WORKBOOK_3 = 'test_xls/test_sheet_count.xls'
+
+class TestWorkbookMethods(unittest.TestCase):
+
+    def setUp(self):
+        self.workbook1 = Workbook(TEST_WORKBOOK_1)
+        self.workbook2 = Workbook(TEST_WORKBOOK_2)
+        self.workbook3 = Workbook(TEST_WORKBOOK_3)
+
+        self.wb1_sheets = self.workbook1.get_sheets()
+        self.wb2_sheets = self.workbook2.get_sheets()
+        self.wb3_sheets = self.workbook3.get_sheets()
+
+    def test_sheets_returned(self):
+        # make sure the number of STAT sheets in the workbook is correct.
+        # 'correct' numbers found by opening test workbooks in Excel
+        workbook1_answer = 36
+        workbook2_answer = 36
+        workbook3_answer = 3
+
+        workbook1_number = len(self.wb1_sheets)
+        workbook2_number = len(self.wb2_sheets)
+        workbook3_number = len(self.wb3_sheets)
+
+        self.assertEqual(workbook1_number, workbook1_answer)
+        self.assertEqual(workbook2_number, workbook2_answer)
+        self.assertEqual(workbook3_number, workbook3_answer)
+
+    def test_get_lookzones(self):
+        # make sure lookzones are returned from the workbook for each sheet.
+        # there is usually 2-3 lookzones, but always more than 0
+        # TODO make sure this is actually true... also maybe its always >=2?
+        for sheet in self.wb1_sheets:
+            self.assertTrue(self.workbook1.get_lookzones(sheet) > 0)
+        for sheet in self.wb2_sheets:
+            self.assertTrue(self.workbook2.get_lookzones(sheet) > 0)
+
+if __name__ == '__main__':
+    unittest.main()
