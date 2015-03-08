@@ -2,6 +2,7 @@ import xlrd
 import xlwt
 import pprint
 from lookzone import Lookzone
+
 class Workbook():
     """ Wraps the xlrd Book object """
     def __init__(self, workbook_file):
@@ -88,18 +89,11 @@ class Workbook():
         """ Prints sheets containing given attributes to filename. """
         book = xlwt.Workbook() # Create the book
         for attribute in attrs: # Creat sheet for each attribute
-            row_count = 0
-            col_count = 0
             write_sheet = book.add_sheet(attribute) # Create the sheet
-            for subject in self._stat_sheets: # loop through subjects
-                for lookzone in self.get_lookzones(subject):
+            for row_count, subject in enumerate(self._stat_sheets): # loop through subjects
+                for col_count, lookzone in enumerate(self.get_lookzones(subject)):
                     if lookzone.has_attribute(attribute): # only add if attr exists
                         write_sheet.write(row_count,col_count,lookzone.value_for_attribute(attribute))
-                    col_count = col_count + 1
-                row_count = row_count + 1
-                col_count = 0
-
-
 
         book.save(filename)
 
