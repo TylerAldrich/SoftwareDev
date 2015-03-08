@@ -90,7 +90,7 @@ class Workbook():
     def grab_attributes(self):
         """returns a hash of a set of attributes for lookzone attributes and slide attributes
         OUTPUT: {'lookzone' : (Setof String), 'slide' : (Setof String)} """
-        lookzone_attrs = set() 
+        lookzone_attrs = set()
         slide_attrs = set()
         for sheet in self._stat_sheets:
             row = 0
@@ -108,7 +108,7 @@ class Workbook():
 
         return {"lookzone" : lookzone_attrs, "slide" : slide_attrs} # return as hash
 
-    def write_workbook(self, filename, *attrs):
+    def write_lookzone_workbook(self, filename, *attrs):
         """ Prints sheets containing given attributes to filename. """
         book = xlwt.Workbook() # Create the book
         subject_id = self.get_subject_id()
