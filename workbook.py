@@ -1,7 +1,7 @@
 import xlrd
 import xlwt
 import pprint
-from lookzone import Lookzone
+from lookzone import Metrics, Lookzone, Slidemetrics 
 
 class Workbook():
     """ Wraps the xlrd Book object """
@@ -83,6 +83,24 @@ class Workbook():
                 lookzone_count = lookzone_count + 1 # increments
             row = row + 1
         return lookzones
+ 
+
+
+    def get_slidemetrics(self, sheet):
+        row = 0
+        slidemetrics = []
+        while sheet.cell_value(row,0) != "SLIDE METRICS:": # Loop until first slide metric
+            row = row + 1
+        row = row + 1
+
+        while row < sheet.nrows:
+            slidemetrics_count = 0 # Start adding in slidemetrics
+            if sheet.cell_type(row,1) == 1 : # Found a slide metric
+                slidemetrics.append(Slidemetrics(sheet.cell_value(row,1))) # name that slide metric
+            elif sheet.cell_type(row,0) == 1:  # attribute
+                slidemetrics[slidemetrics_count].add_value_for_attribute(sheet.cell_value(row,5),sheet.cell_value(row,0))
+            row = row + 1
+        return slidemetrics
 
 
     def write_workbook(self, filename, *attrs):
@@ -94,6 +112,22 @@ class Workbook():
                 for col_count, lookzone in enumerate(self.get_lookzones(subject)):
                     if lookzone.has_attribute(attribute): # only add if attr exists
                         write_sheet.write(row_count,col_count,lookzone.value_for_attribute(attribute))
+
+
+        book.save(filename)
+
+
+    def write_slidemetrics_workbook(self, filename, *attrs):
+        """ Prints sheets containing given attributes to filename. """
+        book = xlwt.Workbook() # Create the book
+        for attribute in attrs: # Creat sheet for each attribute
+            write_sheet = book.add_sheet(attribute) # Create the sheet
+            for row_count, subject in enumerate(self._stat_sheets): # loop through subjects
+                for col_count, slidemetrics in enumerate(self.get_slidemetrics(subject)):
+                    if slidemtrics.has_attribute(attribute): # only add if attr exists
+                        write_sheet.write(row_count,col_count,slidemetrics.value_for_attribute(attribute))
+ 
+
 
         book.save(filename)
 

@@ -1,6 +1,6 @@
 import pprint
 
-class Lookzone():
+class Metrics():
     def __init__(self, name):
         self.data = {}
         self.name = name
@@ -13,3 +13,14 @@ class Lookzone():
 
     def has_attribute(self,attr):
         return self.data.get(attr) != None
+
+class Lookzone(Metrics):
+    def __init__(self, name):
+        Metrics.__init__(self, name)
+        #self.name = name
+
+
+class Slidemetrics(Metrics):    
+    def __init__(self, name):
+        Metrics.__init__(self, name)
+       # self.name = name 
