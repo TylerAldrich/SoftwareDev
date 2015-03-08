@@ -1,7 +1,8 @@
 import xlrd
 import xlwt
 import pprint
-from lookzone import Lookzone
+import pdb
+from lookzone import Metrics, Lookzone, Slidemetrics 
 
 class Workbook():
     """ Wraps the xlrd Book object """
@@ -86,6 +87,23 @@ class Workbook():
                 lookzones[lookzone_count].add_value_for_attribute(sheet.cell_value(row,5),sheet.cell_value(row,0))
             row = row + 1
         return lookzones
+ 
+
+   # pdb.set_trace()
+    def get_slidemetrics(self, sheet):
+        row = 0
+        slidemetric = Slidemetrics("blah")  
+        while sheet.cell_value(row,0) != "SLIDE METRICS:": # Loop until first slide metric
+            row = row + 1
+        row = row + 1
+
+        while sheet.cell_value(row,0) != "LOOKZONE METRICS:":
+            if sheet.cell_type(row,0) == 1 : # Found a slide metric
+                slidemetric.add_value_for_attribute(sheet.cell_value(row,5),sheet.cell_value(row,0))
+            #elif sheet.cell_type(row,0) == 1:
+  
+            row = row + 1
+        return slidemetric
 
     def grab_attributes(self):
         """returns a hash of a set of attributes for lookzone attributes and slide attributes
@@ -144,6 +162,41 @@ class Workbook():
                     if lookzone.has_attribute(attribute): # only add if attr exists
                         write_sheet.write(row_num,col_num,lookzone.value_for_attribute(attribute))
                     col_num += 1
+
+
+        book.save(filename)
+
+
+    def write_slidemetrics_workbook(self, filename, *attrs):
+        book = xlwt.Workbook() # Create the book
+        subject_id = self.get_subject_id()
+        self.get_sheets() # populate stat sheets
+
+        for attribute in attrs: # Create sheet for each attribute
+            write_sheet = book.add_sheet(attribute) # Create the sheet
+            #slidemetric = get_slidemetrics(self, write_sheet)
+            # Set up sheets headers
+            write_sheet.write(0, 0, 'SubjectID')
+            row_num = 0
+            col_num = 1
+            current_slidemetric_num = 1
+            for stat in self._stat_sheets:
+                sheet_name = stat.name.split('.')[0]     
+                col_name =  sheet_name
+                current_slidemetric_num += 1
+                write_sheet.write(row_num, col_num, col_name)
+                col_num += 1
+                current_lookzone_num = 1
+           
+            # Add data for the subject
+            write_sheet.write(1, 0, subject_id)
+            row_num = 1
+            col_num = 1
+            for stat in self._stat_sheets:
+                slidemetric = self.get_slidemetrics(stat)
+                if slidemetric.has_attribute(attribute): # only add if attr exists
+                    write_sheet.write(row_num,col_num,slidemetric.value_for_attribute(attribute))
+                col_num += 1
 
         book.save(filename)
 
