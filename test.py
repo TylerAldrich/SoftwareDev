@@ -42,5 +42,14 @@ class TestWorkbookMethods(unittest.TestCase):
         for sheet in self.wb2_sheets:
             self.assertTrue(self.workbook2.get_lookzones(sheet) > 0)
 
+    def test_subject_id(self):
+        # make sure the correct subject id is returned
+        workbook1_id = self.workbook1.get_subject_id()
+        workbook2_id = self.workbook2.get_subject_id()
+
+        self.assertEqual(workbook1_id, '191144')
+        self.assertEqual(workbook2_id, '191150')
+
+
 if __name__ == '__main__':
     unittest.main()

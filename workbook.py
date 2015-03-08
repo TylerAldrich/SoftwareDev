@@ -9,6 +9,7 @@ class Workbook():
         self.workbook = xlrd.open_workbook(workbook_file)
         self._stat_sheets = []
         self._data_dict = {}
+        self.workbook_filename = workbook_file
 
     def get_sheets(self):
         """ Return needed sheets from the workbook (end in STAT) """
@@ -17,9 +18,12 @@ class Workbook():
             self._stat_sheets = [self.workbook.sheet_by_name(sheet) for sheet in stat_sheet_names]
 
         return self._stat_sheets
-    def get_subject_id():
-        # TODO: Is this the number before the sheetname?
-        pass
+
+    def get_subject_id(self):
+        """ Return subject id (first numbers in file name)"""
+        # get xls filename (end of path x/y/z/123-foo.xls)
+        filename = self.workbook_filename.split('/')[-1]
+        return filename.split('-')[0].strip()
 
     # Don't think we need this anymore
     def generate_contents(self, sheet):
