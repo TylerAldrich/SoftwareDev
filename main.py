@@ -16,3 +16,4 @@ if __name__ == '__main__':
 
     workbook.write_workbook(filename, "Width", "Appears", "Gazepoint count")
     print "File created: " + filename
+

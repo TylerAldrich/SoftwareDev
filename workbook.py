@@ -87,6 +87,26 @@ class Workbook():
             row = row + 1
         return lookzones
 
+    def grab_attributes(self):
+        """returns a hash of a set of attributes for lookzone attributes and slide attributes
+        OUTPUT: {'lookzone' : (Setof String), 'slide' : (Setof String)} """
+        lookzone_attrs = set() 
+        slide_attrs = set()
+        for sheet in self._stat_sheets:
+            row = 0
+            # Loop through slide metrics
+            while sheet.cell_value(row,0) != "LOOKZONE METRICS:":
+                if sheet.cell_type(row,0) == 1 : # Found a slide metric
+                    slide_attrs.add(sheet.cell_value(row,0)) # add that slide metric
+                row += 1
+            row += 1  # increment one more time for next section
+            # loop through rest of file (lookzones)
+            while row < sheet.nrows:
+                if sheet.cell_type(row,0) == 1: # Found a lookzone
+                    lookzone_attrs.add(sheet.cell_value(row,0))
+                row += 1
+
+        return {"lookzone" : lookzone_attrs, "slide" : slide_attrs} # return as hash
 
     def write_workbook(self, filename, *attrs):
         """ Prints sheets containing given attributes to filename. """
