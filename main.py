@@ -18,3 +18,4 @@ if __name__ == '__main__':
     data_dict = workbook.get_data(stat_sheets[0])
     workbook.write_workbook(filename, "Width", "Appears", "Gazepoint count")
     print "File created: " + filename
+
