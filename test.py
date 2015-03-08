@@ -44,14 +44,18 @@ class TestWorkbookMethods(unittest.TestCase):
 
     def test_grab_attributes(self):
         # make sure the number of attributes is correct
+        hsh_len = 2
+        slide_len = 38
+        lookzone_len = 120
+
         attrs1 = self.workbook1.grab_attributes()
         attrs2 = self.workbook2.grab_attributes()
-        self.assertEqual(len(attrs1),2)
-        self.assertEqual(len(attrs2),2)
-        self.assertEqual(len(attrs1["slide"]), 38)
-        self.assertEqual(len(attrs2["slide"]), 38)
-        self.assertEqual(len(attrs1["lookzone"]), 120)
-        self.assertEqual(len(attrs2["lookzone"]), 120)
+        self.assertEqual(len(attrs1),hsh_len)
+        self.assertEqual(len(attrs2),hsh_len)
+        self.assertEqual(len(attrs1["slide"]), slide_len)
+        self.assertEqual(len(attrs2["slide"]), slide_len)
+        self.assertEqual(len(attrs1["lookzone"]), lookzone_len)
+        self.assertEqual(len(attrs2["lookzone"]), lookzone_len)
 
 
 if __name__ == '__main__':
