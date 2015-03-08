@@ -78,13 +78,12 @@ class Workbook():
         row = row + 1
 
         while row < sheet.nrows:
-            lookzone_count = 0 # Start adding in Lookzones
+            lookzone_count = -1 # Start adding in Lookzones
             if sheet.cell_type(row,1) == 1 : # Found a lookzone
                 lookzones.append(Lookzone(sheet.cell_value(row,1))) # name that lookzone
+                lookzone_count += 1
             elif sheet.cell_type(row,0) == 1:  # attribute
                 lookzones[lookzone_count].add_value_for_attribute(sheet.cell_value(row,5),sheet.cell_value(row,0))
-            else: # end of lookzone
-                lookzone_count = lookzone_count + 1 # increments
             row = row + 1
         return lookzones
 
@@ -92,12 +91,39 @@ class Workbook():
     def write_workbook(self, filename, *attrs):
         """ Prints sheets containing given attributes to filename. """
         book = xlwt.Workbook() # Create the book
-        for attribute in attrs: # Creat sheet for each attribute
+        subject_id = self.get_subject_id()
+        self.get_sheets() # populate stat sheets
+        for attribute in attrs: # Create sheet for each attribute
             write_sheet = book.add_sheet(attribute) # Create the sheet
-            for row_count, subject in enumerate(self._stat_sheets): # loop through subjects
-                for col_count, lookzone in enumerate(self.get_lookzones(subject)):
+
+            # Set up sheets headers
+            write_sheet.write(0, 0, 'SubjectID')
+            row_num = 0
+            col_num = 1
+            current_lookzone_num = 1
+            for stat in self._stat_sheets:
+                for lookzone in self.get_lookzones(stat):
+                    sheet_name = stat.name.split('.')[0]
+
+                    if "OUTSIDE" in lookzone.name: # last lookzone of the file
+                        col_name = "%s_outside" % sheet_name
+                    else:
+                        col_name = "%s_LZ%s" % (sheet_name, str(current_lookzone_num))
+                        current_lookzone_num += 1
+
+                    write_sheet.write(row_num, col_num, col_name)
+                    col_num += 1
+                current_lookzone_num = 1
+
+            # Add data for the subject
+            write_sheet.write(1, 0, subject_id)
+            row_num = 1
+            col_num = 1
+            for stat in self._stat_sheets:
+                for lookzone in self.get_lookzones(stat):
                     if lookzone.has_attribute(attribute): # only add if attr exists
-                        write_sheet.write(row_count,col_count,lookzone.value_for_attribute(attribute))
+                        write_sheet.write(row_num,col_num,lookzone.value_for_attribute(attribute))
+                    col_num += 1
 
         book.save(filename)
 
