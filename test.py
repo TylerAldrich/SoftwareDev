@@ -42,5 +42,30 @@ class TestWorkbookMethods(unittest.TestCase):
         for sheet in self.wb2_sheets:
             self.assertTrue(self.workbook2.get_lookzones(sheet) > 0)
 
+    def test_grab_attributes(self):
+        # make sure the number of attributes is correct
+        hsh_len = 2
+        slide_len = 38
+        lookzone_len = 120
+
+        attrs1 = self.workbook1.grab_attributes()
+        attrs2 = self.workbook2.grab_attributes()
+        self.assertEqual(len(attrs1),hsh_len)
+        self.assertEqual(len(attrs2),hsh_len)
+        self.assertEqual(len(attrs1["slide"]), slide_len)
+        self.assertEqual(len(attrs2["slide"]), slide_len)
+        self.assertEqual(len(attrs1["lookzone"]), lookzone_len)
+        self.assertEqual(len(attrs2["lookzone"]), lookzone_len)
+
+    def test_subject_id(self):
+        # make sure the correct subject id is returned
+        workbook1_id = self.workbook1.get_subject_id()
+        workbook2_id = self.workbook2.get_subject_id()
+
+        self.assertEqual(workbook1_id, '191144')
+        self.assertEqual(workbook2_id, '191150')
+
+
+
 if __name__ == '__main__':
     unittest.main()
