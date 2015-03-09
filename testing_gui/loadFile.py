@@ -15,24 +15,30 @@ class LoadFileWidget(QtGui.QWidget):
 		self.initUI()
 
 	def initUI(self):
+		## Create initial vertical layout
 		layout = QtGui.QVBoxLayout(self)
 
 		titleLabel = QtGui.QLabel('Upload Excel File', self)
 		subtitleLabel = QtGui.QLabel('Click browse to select an expirement to upload', self)
 
+		## Add two labels to layout
 		layout.addStretch(1)
 		layout.addWidget(titleLabel)
 		layout.addWidget(subtitleLabel)
 
+		## Horizontal layout is for the text box and browse button
 		browseFileLayout = QtGui.QHBoxLayout(self)
 		browseFileLayout.addStretch(1)
 
+		## Init text edit box for file path and browse button to
+		## find the file.  Set browse button on click to selectFile function
 		self.fileTextEdit = QtGui.QLineEdit()
 		browseButton = QtGui.QPushButton('Browse')
 		browseFileLayout.addWidget(self.fileTextEdit)
 		browseFileLayout.addWidget(browseButton)
 		browseButton.clicked.connect(self.selectFile)
 
+		## Add horizontal layout to overall layout
 		layout.addLayout(browseFileLayout)
 		self.button = QtGui.QPushButton('Next')
 		layout.addWidget(self.button)
@@ -40,7 +46,7 @@ class LoadFileWidget(QtGui.QWidget):
 
 	def switchViews(self):
 		fileName = self.fileTextEdit.text()
-		self.window.uploadFile(fileName)
+		self.window.showSlideMetricsView(fileName)
 
 	def selectFile(self):
 		self.fileTextEdit.setText(QtGui.QFileDialog.getOpenFileName())

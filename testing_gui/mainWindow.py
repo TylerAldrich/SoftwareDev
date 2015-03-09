@@ -22,12 +22,14 @@ class Window(QtGui.QMainWindow):
 		## Load up the Load file view
 		self.showLoadFileView()
 
+	## Function to center the window on screen
 	def center(self):
 		qr = self.frameGeometry()
 		cp = QtGui.QDesktopWidget().availableGeometry().center()
 		qr.moveCenter(cp)
 		self.move(qr.topLeft())
 
+	## Function to show dialog for when window is closed
 	def closeEvent(self, event):
 		reply = QtGui.QMessageBox.question(self, 'Message',
 			"Are you sure you want to quit?", QtGui.QMessageBox.Yes |
@@ -38,14 +40,17 @@ class Window(QtGui.QMainWindow):
 		else:
 			event.ignore()
 
-	def uploadFile(self, filePath):
+	## Function to show the screen for selecting slide metric attributes 
+	def showSlideMetricsView(self, filePath):
 		newClass = SelectSlideMetricsWidget(self, filePath)
 		self.setCentralWidget(newClass)
 
+	## Function to show the screen for loading a new excel file
 	def showLoadFileView(self):
 		firstClass = LoadFileWidget(self)
 		self.setCentralWidget(firstClass)
 
+## Main function to run everything
 def main():
 
 	app = QtGui.QApplication(sys.argv)
