@@ -18,11 +18,10 @@ class DictionaryCompleter(QtGui.QCompleter):
 
 class CompletionTextEdit(QtGui.QTextEdit):
     def __init__(self, parent=None):
-        super(CompletionTextEdit, self).__init__(parent)
-        self.setMinimumWidth(400)
-	self.setMaximumHeight(25)
-        self.completer = None
-        self.moveCursor(QtGui.QTextCursor.End)
+      super(CompletionTextEdit, self).__init__(parent)
+      self.setMaximumHeight(25)
+      self.completer = None
+      self.moveCursor(QtGui.QTextCursor.End)
 
     def setCompleter(self, completer):
         if self.completer:
