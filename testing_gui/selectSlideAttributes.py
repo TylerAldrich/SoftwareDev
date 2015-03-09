@@ -38,8 +38,11 @@ class SelectSlideMetricsWidget(QtGui.QWidget):
 
 		## set up auto complete for text field
 		completer = AttributeCompleter()
-		attributeEdit = CompletionTextEdit()
-		attributeEdit.setCompleter(completer)
+
+		## Search bar for attributes
+		self.attributeSearchBar = QtGui.QLineEdit()
+		self.attributeSearchBar.setPlaceholderText('Search')
+		self.attributeSearchBar.textChanged.connect(self.filterAttributes)
 
 		## create horizontal view to hold all attributes list
 		## and selected attributes list
@@ -52,7 +55,7 @@ class SelectSlideMetricsWidget(QtGui.QWidget):
 		## Add label and search bar for selecting attributes
 		attributesLabel = QtGui.QLabel('Select Slide Metric Attributes', self)
 		attributesLayout.addWidget(attributesLabel)
-		attributesLayout.addWidget(attributeEdit)
+		attributesLayout.addWidget(self.attributeSearchBar)
 
 		self.listOfAttributes = self.createListWidget(attributesLayout, test_attributes, self.buttonTextAdd)
 		attributesView.addLayout(attributesLayout)
@@ -80,6 +83,7 @@ class SelectSlideMetricsWidget(QtGui.QWidget):
 		layout.addWidget(self.button)
 		self.button.clicked.connect(self.switchViews)
 
+	## Function to create the list widgets
 	def createListWidget(self, layout, attributes, onClicked):
 		listWidget = QtGui.QListWidget(self)
 		listWidget.addItems(attributes)
@@ -119,3 +123,13 @@ class SelectSlideMetricsWidget(QtGui.QWidget):
 			removedList.append(str(i.text()))
 			self.selectedAttributes.takeItem(self.selectedAttributes.row(i))
 		self.listOfAttributes.addItems(removedList)
+
+	## On typing change, filter attributes
+	def filterAttributes(self):
+		searchedItems = self.listOfAttributes.findItems(self.attributeSearchBar.text(), QtCore.Qt.MatchContains)
+
+		## Iterate through list of attributes we have and hide any that aren't being searched for
+		for index in xrange(self.listOfAttributes.count()):
+			listItem = self.listOfAttributes.item(index)
+			isHidden = listItem not in searchedItems
+			self.listOfAttributes.setItemHidden(listItem, isHidden)
