@@ -2,7 +2,7 @@ import xlrd
 import xlwt
 import pprint
 import pdb
-from lookzone import Metrics, Lookzone, Slidemetrics 
+from metrics import Metrics, Lookzone, Slidemetrics
 
 class Workbook():
     """ Wraps the xlrd Book object """
@@ -87,12 +87,12 @@ class Workbook():
                 lookzones[lookzone_count].add_value_for_attribute(sheet.cell_value(row,5),sheet.cell_value(row,0))
             row = row + 1
         return lookzones
- 
+
 
    # pdb.set_trace()
     def get_slidemetrics(self, sheet):
         row = 0
-        slidemetric = Slidemetrics("blah")  
+        slidemetric = Slidemetrics("blah")
         while sheet.cell_value(row,0) != "SLIDE METRICS:": # Loop until first slide metric
             row = row + 1
         row = row + 1
@@ -101,7 +101,7 @@ class Workbook():
             if sheet.cell_type(row,0) == 1 : # Found a slide metric
                 slidemetric.add_value_for_attribute(sheet.cell_value(row,5),sheet.cell_value(row,0))
             #elif sheet.cell_type(row,0) == 1:
-  
+
             row = row + 1
         return slidemetric
 
@@ -181,13 +181,13 @@ class Workbook():
             col_num = 1
             current_slidemetric_num = 1
             for stat in self._stat_sheets:
-                sheet_name = stat.name.split('.')[0]     
+                sheet_name = stat.name.split('.')[0]
                 col_name =  sheet_name
                 current_slidemetric_num += 1
                 write_sheet.write(row_num, col_num, col_name)
                 col_num += 1
                 current_lookzone_num = 1
-           
+
             # Add data for the subject
             write_sheet.write(1, 0, subject_id)
             row_num = 1
