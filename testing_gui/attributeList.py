@@ -4,11 +4,6 @@
 import sys
 from sys import argv
 from PyQt4 import QtGui, QtCore
-from autocomplete import CompletionTextEdit
-
-class AttributeCompleter(QtGui.QCompleter):
-	def __init__(self, parent=None):
-		QtGui.QCompleter.__init__(self, ['a', 'b', 'c'], parent)
 
 # set up UI for two list horizontally aligned listviews
 # to display attributes to choose and chosen ones.
