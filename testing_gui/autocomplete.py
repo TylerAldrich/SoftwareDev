@@ -56,7 +56,6 @@ class CompletionTextEdit(QtGui.QTextEdit):
         QtGui.QTextEdit.focusInEvent(self, event)
 
     def mousePressEvent(self, event):
-	print 'Clicked'
 	eow = QtCore.QString("~!@#$%^&*()+{}|:\"<>?,./;'[]\\-=") #end of word
 
         hasModifier = ((event.modifiers() != QtCore.Qt.NoModifier) and

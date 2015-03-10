@@ -39,13 +39,19 @@ class AttributeListsComponent(QtGui.QWidget):
 		attributesView.addLayout(selectedAttrsList)
 
 		layout.addLayout(attributesView)
+		# filter on initial load in case loading a prior state
+		self.filterAttributes()
 
 	# construct and return a widget containing a filter box 
 	def makeSearch(self):
-		completer = AttributeCompleter()
-		attributeEdit = CompletionTextEdit()
-		attributeEdit.setCompleter(completer)
-		return attributeEdit
+		# Search bar for attributes
+		self.attributeSearchBar = QtGui.QLineEdit()
+		self.attributeSearchBar.setPlaceholderText('Search')
+		# set the filter text if we have past GUI state to restore
+		if len(self.filter) > 0:
+			self.attributeSearchBar.setText(self.filter)
+		self.attributeSearchBar.textChanged.connect(self.filterAttributes)
+		return self.attributeSearchBar
 
 	# construct and return layout containing choose attrs list and filterbox
 	def makeChooseAttrsList(self):
@@ -122,6 +128,7 @@ class AttributeListsComponent(QtGui.QWidget):
 	def saveState(self):
 		self.window.guiState[self.__class__.guiStateKey]['chooseAttrsItems'] = self.getItemsFromListView(self.chooseListWidget)
 		self.window.guiState[self.__class__.guiStateKey]['selectedAttrsItems'] = self.getItemsFromListView(self.selectedListWidget)
+		self.window.guiState[self.__class__.guiStateKey]['filter'] = self.attributeSearchBar.text()
 
 	# load the GUI state if available
 	def loadState(self):
@@ -131,6 +138,7 @@ class AttributeListsComponent(QtGui.QWidget):
 			self.window.guiState[self.__class__.guiStateKey] = { 'chooseAttrsItems': self.__class__.test_attributes, 'selectedAttrsItems': [], 'filter': '' }
 
 		self.attributes = self.window.guiState[self.__class__.guiStateKey]['chooseAttrsItems']
+		self.filter = self.window.guiState[self.__class__.guiStateKey]['filter']
 		self.selectedAttributes = self.window.guiState[self.__class__.guiStateKey]['selectedAttrsItems']
 
 	# clears window saved GUI state for this view
@@ -145,3 +153,13 @@ class AttributeListsComponent(QtGui.QWidget):
 			items.append(widget.item(index))
 		labels = [i.text() for i in items]
 		return labels
+
+	# On typing change, filter attributes
+	def filterAttributes(self):
+		searchedItems = self.chooseListWidget.findItems(self.attributeSearchBar.text(), QtCore.Qt.MatchContains)
+
+		# Iterate through list of attributes we have and hide any that aren't being searched for
+		for index in xrange(self.chooseListWidget.count()):
+			listItem = self.chooseListWidget.item(index)
+			isHidden = listItem not in searchedItems
+			self.chooseListWidget.setItemHidden(listItem, isHidden)
