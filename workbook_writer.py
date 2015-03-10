@@ -3,9 +3,9 @@ from metrics import Metrics, Lookzone, Slidemetrics
 from workbook_reader import WorkbookReader
 
 class WorkbookWriter():
-    """ Instantiated with a list of workbook_readers, filename for lookzone output, and 
-    filename for slide metrics output, and a list of attributes"""
     def __init__(self, readers, output, attributes):
+        """ Instantiated with a list of workbook_readers, filename for lookzone output, and 
+        filename for slide metrics output, and a list of attributes"""
         self.readers = readers
         self.output = output
         self.attributes = attributes
@@ -73,7 +73,6 @@ class LookzoneWriter(WorkbookWriter):
         book.save(self.output)
 
 class SlideMetricWriter(WorkbookWriter):
-
     def __init__(self, readers, output, attrs):
         """ Initialize instance of a lookzone writer.
         @Params: readers - Listof WorkbookReader
