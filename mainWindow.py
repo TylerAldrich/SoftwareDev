@@ -69,8 +69,14 @@ class Window(QtGui.QMainWindow):
 
   ## Function to save slide metric attributes
   def saveSlideMetricsData(self, filePath, attrs):
-    slide_writer = SlideMetricWriter(self.reader, filePath, attrs)
+    slide_writer = SlideMetricWriter([self.reader], filePath, attrs)
     slide_writer.write_first_reader()
+    self.showLoadFileView()
+
+  ## Function to save lookzone attributes
+  def saveLookzoneData(self, filePath, attrs):
+    lookzone_writer = LookzoneWriter([self.reader], filePath, attrs)
+    lookzone_writer.write_first_reader()
 
 # Main function to run everything
 def main():

@@ -88,7 +88,11 @@ class SlideMetricWriter(WorkbookWriter):
         subject_id = reader.get_subject_id()
 
         for attribute in self.attributes: # Create sheet for each attribute
-            write_sheet = book.add_sheet(attribute) # Create the sheet
+            sheet_name = attribute
+            if len(sheet_name) > 31:
+              sheet_name = sheet_name[:26]
+              sheet_name += '...'
+            write_sheet = book.add_sheet(sheet_name) # Create the sheet
             #slidemetric = get_slidemetrics(self, write_sheet)
             # Set up sheets headers
             write_sheet.write(0, 0, 'SubjectID')
