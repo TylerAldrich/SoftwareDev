@@ -47,7 +47,7 @@ class LoadFileWidget(QtGui.QWidget):
 	# go to next view to select data attributes
 	def switchViews(self):
 		fileName = self.fileTextEdit.text()
-		self.window.showSlideMetricsView()
+		self.window.showSlideMetricsView(fileName)
 
 	# open a file dialog to pick an xlsx input file
 	def selectFile(self):
