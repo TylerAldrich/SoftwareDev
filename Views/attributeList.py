@@ -129,8 +129,7 @@ class AttributeListsComponent(QtGui.QWidget):
 	def loadState(self):
 		# if there is no saved state, create a new one for this view
 		if not self.window.guiState.has_key(self.__class__.guiStateKey):
-			# TODO: change test_attributes to actual ones from file
-			self.window.guiState[self.__class__.guiStateKey] = { 'chooseAttrsItems': self.__class__.test_attributes, 'selectedAttrsItems': [], 'filter': '' }
+			self.window.guiState[self.__class__.guiStateKey] = { 'chooseAttrsItems': self.__class__.attr_list, 'selectedAttrsItems': [], 'filter': '' }
 
 		self.attributes = self.window.guiState[self.__class__.guiStateKey]['chooseAttrsItems']
 		self.filter = self.window.guiState[self.__class__.guiStateKey]['filter']
@@ -146,7 +145,7 @@ class AttributeListsComponent(QtGui.QWidget):
 		items = []
 		for index in xrange(widget.count()):
 			items.append(widget.item(index))
-		labels = [i.text() for i in items]
+		labels = [str(i.text()) for i in items]
 		return labels
 
 	# On typing change, filter attributes

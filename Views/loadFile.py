@@ -4,7 +4,6 @@
 import sys
 from sys import argv
 from PyQt4 import QtGui, QtCore
-from autocomplete import CompletionTextEdit 
 from navigation import NavigationWidget
 
 # Widget that has user browse for an input file
@@ -47,7 +46,7 @@ class LoadFileWidget(QtGui.QWidget):
 	# go to next view to select data attributes
 	def switchViews(self):
 		fileName = self.fileTextEdit.text()
-		self.window.showSlideMetricsView()
+		self.window.showSlideMetricsView(fileName)
 
 	# open a file dialog to pick an xlsx input file
 	def selectFile(self):
