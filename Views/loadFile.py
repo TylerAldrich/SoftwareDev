@@ -4,7 +4,6 @@
 import sys
 from sys import argv
 from PyQt4 import QtGui, QtCore
-from autocomplete import CompletionTextEdit 
 from navigation import NavigationWidget
 
 # Widget that has user browse for an input file

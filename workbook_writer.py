@@ -40,7 +40,11 @@ class LookzoneWriter(WorkbookWriter):
         book = xlwt.Workbook() # Create the book
         subject_id = reader.get_subject_id()
         for attribute in self.attributes: # Create sheet for each attribute
-            write_sheet = book.add_sheet(attribute) # Create the sheet
+            sheet_name = attribute.replace('/', "'d") # Sheet names do not support slashes
+            if len(sheet_name) > 31:
+              sheet_name = sheet_name[:26]
+              sheet_name += '...'
+            write_sheet = book.add_sheet(sheet_name) # Create the sheet
 
             # Set up sheets headers
             write_sheet.write(0, 0, 'SubjectID')
@@ -88,7 +92,7 @@ class SlideMetricWriter(WorkbookWriter):
         subject_id = reader.get_subject_id()
 
         for attribute in self.attributes: # Create sheet for each attribute
-            sheet_name = attribute
+            sheet_name = attribute.replace('/', "'d") # Sheet names do not support slashes
             if len(sheet_name) > 31:
               sheet_name = sheet_name[:26]
               sheet_name += '...'

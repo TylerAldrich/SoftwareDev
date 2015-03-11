@@ -4,7 +4,6 @@
 import sys
 from sys import argv
 from PyQt4 import QtGui, QtCore
-from autocomplete import CompletionTextEdit 
 from navigation import NavigationWidget
 
 # Widget that has user browse for an input file
@@ -23,59 +22,63 @@ class SaveFileWidget(QtGui.QWidget):
     layout = QtGui.QVBoxLayout(self)
     layout.setAlignment(QtCore.Qt.AlignTop)
 
-    titleLabel = QtGui.QLabel('Save Slide Metrics File', self)
-    subtitleLabel = QtGui.QLabel('Click browse to select a location to save your Slide Metrics data', self)
+    if len(self.slide_attrs) > 0:
+      titleLabel = QtGui.QLabel('Save Slide Metrics File', self)
+      subtitleLabel = QtGui.QLabel('Click browse to select a location to save your Slide Metrics data', self)
 
-    # Add two labels to layout
-    layout.addWidget(titleLabel)
-    layout.addWidget(subtitleLabel)
+      # Add two labels to layout
+      layout.addWidget(titleLabel)
+      layout.addWidget(subtitleLabel)
 
-    # Horizontal layout is for the text box and browse button
-    browseFileLayout = QtGui.QHBoxLayout(self)
+      # Horizontal layout is for the text box and browse button
+      browseFileLayout = QtGui.QHBoxLayout(self)
+      # Init text edit box for file path and browse button to
+      # find the file.  Set browse button on click to selectFile function
+      self.fileTextEdit = QtGui.QLineEdit()
+      browseButton = QtGui.QPushButton('Browse')
+      browseFileLayout.addWidget(self.fileTextEdit)
+      browseFileLayout.addWidget(browseButton)
+      browseButton.clicked.connect(self.selectSlideLoc)
 
-    # Init text edit box for file path and browse button to
-    # find the file.  Set browse button on click to selectFile function
-    self.fileTextEdit = QtGui.QLineEdit()
-    browseButton = QtGui.QPushButton('Browse')
-    browseFileLayout.addWidget(self.fileTextEdit)
-    browseFileLayout.addWidget(browseButton)
-    browseButton.clicked.connect(self.selectSlideLoc)
-
-    layout.addLayout(browseFileLayout)
+      layout.addLayout(browseFileLayout)
 
     ## Save lookzone section
-    lookTitleLabel = QtGui.QLabel('Save Lookzone File', self)
-    lookSubtitleLabel = QtGui.QLabel('Click browse to select a location to save your Lookzone data', self)
+    if len(self.lookzone_attrs) > 0:
+      lookTitleLabel = QtGui.QLabel('Save Lookzone File', self)
+      lookSubtitleLabel = QtGui.QLabel('Click browse to select a location to save your Lookzone data', self)
 
-    # Add two labels to layout
-    layout.addWidget(lookTitleLabel)
-    layout.addWidget(lookSubtitleLabel)
+      # Add two labels to layout
+      layout.addWidget(lookTitleLabel)
+      layout.addWidget(lookSubtitleLabel)
 
-    # Horizontal layout is for the text box and browse button
-    browseLookzoneFileLayout = QtGui.QHBoxLayout(self)
+      # Horizontal layout is for the text box and browse button
+      browseLookzoneFileLayout = QtGui.QHBoxLayout(self)
 
-    # Init text edit box for file path and browse button to
-    # find the file.  Set browse button on click to selectFile function
-    self.lookzoneFileEdit = QtGui.QLineEdit()
-    browseLookzoneButton = QtGui.QPushButton('Browse')
-    browseLookzoneFileLayout.addWidget(self.lookzoneFileEdit)
-    browseLookzoneFileLayout.addWidget(browseLookzoneButton)
-    browseLookzoneButton.clicked.connect(self.selectLookzoneLoc)
+      # Init text edit box for file path and browse button to
+      # find the file.  Set browse button on click to selectFile function
+      self.lookzoneFileEdit = QtGui.QLineEdit()
+      browseLookzoneButton = QtGui.QPushButton('Browse')
+      browseLookzoneFileLayout.addWidget(self.lookzoneFileEdit)
+      browseLookzoneFileLayout.addWidget(browseLookzoneButton)
+      browseLookzoneButton.clicked.connect(self.selectLookzoneLoc)
+      # Add horizontal layout to overall layout
+      layout.addLayout(browseLookzoneFileLayout)
 
-    # Add horizontal layout to overall layout
-    layout.addLayout(browseLookzoneFileLayout)
     navigation = NavigationWidget(self.window, None, self.switchViews)
     layout.addWidget(navigation)
 
   # go to next view to select data attributes
   def switchViews(self):
-    # Save slide metrics data
-    slideFileName = self.fileTextEdit.text()
-    self.window.saveSlideMetricsData(slideFileName, self.slide_attrs)
 
-    # Save Lookzone metrics data
-    lookzoneFileName = self.lookzoneFileEdit.text()
-    self.window.saveLookzoneData(lookzoneFileName, self.lookzone_attrs)
+    if len(self.slide_attrs) > 0:
+      # Save slide metrics data
+      slideFileName = self.fileTextEdit.text()
+      self.window.saveSlideMetricsData(slideFileName, self.slide_attrs)
+
+    if len(self.lookzone_attrs) > 0:
+      # Save Lookzone metrics data
+      lookzoneFileName = self.lookzoneFileEdit.text()
+      self.window.saveLookzoneData(lookzoneFileName, self.lookzone_attrs)
     self.window.showLoadFileView()
 
   # open a file dialog to pick an xlsx input file for lookzone data
