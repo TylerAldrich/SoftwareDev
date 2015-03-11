@@ -70,7 +70,7 @@ class WorkbookReader():
 
 
     def get_slidemetrics(self, sheet):
-        "Return the slide metric object for the given sheet"
+        """Return the slide metric object for the given sheet"""
         row = 0
         slidemetric = Slidemetrics("blah")
         while sheet.cell_value(row,0) != "SLIDE METRICS:": # Loop until first slide metric
