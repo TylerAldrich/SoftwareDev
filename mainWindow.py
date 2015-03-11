@@ -72,7 +72,6 @@ class Window(QtGui.QMainWindow):
     if len(attrs) > 0:
       slide_writer = SlideMetricWriter([self.reader], filePath, attrs)
       slide_writer.write_first_reader()
-      self.showLoadFileView()
 
   ## Function to save lookzone attributes
   def saveLookzoneData(self, filePath, attrs):
