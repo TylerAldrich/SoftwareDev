@@ -99,7 +99,7 @@ class SaveFileWidget(QtGui.QWidget):
   def createSaveExcelDialog(self):
     save_dialog = QtGui.QFileDialog(self)
     save_dialog.setFileMode(QtGui.QFileDialog.AnyFile)
-    save_dialog.setNameFilter(self.tr("Excel (*.xlsx)"))
-    save_dialog.setDefaultSuffix("xlsx")
+    save_dialog.setNameFilter(self.tr("Excel (*.xls)"))
+    save_dialog.setDefaultSuffix("xls")
     return save_dialog
 
