@@ -5,6 +5,7 @@ import pprint
 from workbook_reader import WorkbookReader
 from workbook_writer import LookzoneWriter
 from workbook_writer import SlideMetricWriter
+from configuration import Configuration
 
 #Checks that the command line contains the necessary arguments and throws an error if not
 if __name__ == '__main__':
@@ -32,6 +33,3 @@ if __name__ == '__main__':
     for writer in [lookzone_writer, slide_metric_writer]:
         writer.write_first_reader()
         print "File created: " + writer.output
-
-
-
