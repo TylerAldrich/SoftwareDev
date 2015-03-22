@@ -5,8 +5,8 @@ class Configuration():
         self._slide_attrs = slide_attrs
         self._filename = filename
 
-    @classmethod
-    def read_config_file(cls,filename):
+    @staticmethod
+    def read_config_file(filename):
         """This is a class method that reads in an existing Configuration File
         and returns a dictionary containing all attributes"""
         f = open(filename, 'r')

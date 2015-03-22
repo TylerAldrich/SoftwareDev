@@ -33,3 +33,7 @@ if __name__ == '__main__':
     for writer in [lookzone_writer, slide_metric_writer]:
         writer.write_first_reader()
         print "File created: " + writer.output
+
+
+
+
