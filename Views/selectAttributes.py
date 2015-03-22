@@ -11,10 +11,12 @@ from navigation import NavigationWidget
 class SelectAttributesWidget(QtGui.QWidget):
   procNext = QtCore.pyqtSignal()
 
-  def __init__(self, window, lookzone_attrs, slide_attrs):
+  def __init__(self, window, lookzone_attrs, slide_attrs, saved_slide, saved_lookzone):
     QtGui.QWidget.__init__(self)
     self.lookzone_attrs = lookzone_attrs
     self.slide_attrs = slide_attrs
+    self.saved_slide = saved_slide
+    self.saved_lookzone = saved_lookzone
     self.window = window
     self.initUI()
 
@@ -23,8 +25,8 @@ class SelectAttributesWidget(QtGui.QWidget):
 
     # Set up the Attribute Type tabs
     tabsWidget = QtGui.QTabWidget()
-    self.slideMetricsTab = SlideMetricsAttrListsComponent(self.window, self.slide_attrs)
-    self.lookzoneTab = LookzoneAttrListsComponent(self.window, self.lookzone_attrs)
+    self.slideMetricsTab = SlideMetricsAttrListsComponent(self.window, self.slide_attrs, self.saved_slide)
+    self.lookzoneTab = LookzoneAttrListsComponent(self.window, self.lookzone_attrs, self.saved_lookzone)
 
     tabsWidget.addTab(self.slideMetricsTab, "Slide Metrics")
     tabsWidget.addTab(self.lookzoneTab, "LookZone Data")
@@ -37,7 +39,7 @@ class SelectAttributesWidget(QtGui.QWidget):
 
   # Switches back to loading input file view
   def goToSetupView(self):
-    self.window.showLoadFileView()
+    self.window.showLoadConfigView()
     # Since going back to file selection requires file analysis before
     # coming back to this screen, clear state of chosen attributes
     self.slideMetricsTab.clearState()

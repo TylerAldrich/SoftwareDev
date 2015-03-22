@@ -17,6 +17,7 @@ class LookzoneAttrListsComponent(AttributeListsComponent):
     'LZ attr 6',
     'LZ attr 7'
     ]
-  def __init__(self, window, attrs):
+  def __init__(self, window, attrs, saved_attrs):
     self.__class__.attr_list = attrs
+    self.__class__.saved_attrs = saved_attrs
     AttributeListsComponent.__init__(self, window)

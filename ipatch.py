@@ -7,8 +7,12 @@ from PyQt4 import QtGui, QtCore
 from Views.selectAttributes import SelectAttributesWidget
 from Views.loadFile import LoadFileWidget
 from Views.saveFilesWidget import SaveFileWidget
+from Views.loadConfig import LoadConfigWidget
+from Views.slideMetricsAttrLists import SlideMetricsAttrListsComponent
+from Views.lookzoneAttrLists import LookzoneAttrListsComponent
 from workbook_reader import WorkbookReader
 from workbook_writer import SlideMetricWriter, LookzoneWriter
+from configuration import Configuration
 
 # The main class that starts and enables flow through
 # the different views of the application
@@ -49,13 +53,28 @@ class Window(QtGui.QMainWindow):
       event.ignore()
 
   # Function to show the screen for selecting slide metric attributes 
-  def showSlideMetricsView(self, filePath):
-    self.reader = WorkbookReader(str(filePath))
+  def showSlideMetricsView(self, configFilePath):
+    # First parse the experiment from the saved file path
+    self.reader = WorkbookReader(str(self.experimentFilePath))
     attrs = self.reader.get_attributes()
     lookzone_attrs = attrs['lookzone'];
     slide_attrs = attrs['slide'];
-    newClass = SelectAttributesWidget(self, list(lookzone_attrs), list(slide_attrs))
-    self.setCentralWidget(newClass)
+
+    saved_slide = []
+    saved_lookzone = []
+    if len(configFilePath):
+      saved_attrs = Configuration.read_config_file(configFilePath)
+      saved_slide = saved_attrs['slide']
+      saved_lookzone = saved_attrs['lookzone']
+
+    self.selectAttributesWidget = SelectAttributesWidget(self, list(lookzone_attrs), list(slide_attrs), saved_slide, saved_lookzone)
+    self.setCentralWidget(self.selectAttributesWidget)
+
+  # Function to show the screen for selecting a configuration file
+  def showLoadConfigView(self, experimentFilePath):
+    self.experimentFilePath = experimentFilePath
+    loadConfig = LoadConfigWidget(self)
+    self.setCentralWidget(loadConfig)
 
   # Function to show the screen for loading a new excel file
   def showLoadFileView(self):
@@ -78,6 +97,19 @@ class Window(QtGui.QMainWindow):
     if len(attrs) > 0:
       lookzone_writer = LookzoneWriter([self.reader], filePath, attrs)
       lookzone_writer.write_first_reader()
+
+	## Function to save the configuration file
+  def saveConfigFile(self, filePath, slide_attrs, lookzone_attrs):
+    config = Configuration(filePath, lookzone_attrs, slide_attrs)
+    config.print_config_file()
+
+  ## Function to clear the state of the attributes screen after saving
+  def clearAttributesState(self):
+    if self.guiState.has_key(SlideMetricsAttrListsComponent.guiStateKey):
+      del self.guiState[SlideMetricsAttrListsComponent.guiStateKey]
+
+    if self.guiState.has_key(LookzoneAttrListsComponent.guiStateKey):
+      del self.guiState[LookzoneAttrListsComponent.guiStateKey]
 
 # Main function to run everything
 def main():

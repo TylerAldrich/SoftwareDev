@@ -7,7 +7,7 @@ from PyQt4 import QtGui, QtCore
 from navigation import NavigationWidget
 
 # Widget that has user browse for an input file
-class LoadFileWidget(QtGui.QWidget):
+class LoadConfigWidget(QtGui.QWidget):
 	procNext = QtCore.pyqtSignal()
 
 	def __init__(self, window):
@@ -20,8 +20,8 @@ class LoadFileWidget(QtGui.QWidget):
 		layout = QtGui.QVBoxLayout(self)
 		layout.setAlignment(QtCore.Qt.AlignTop)
 
-		titleLabel = QtGui.QLabel('Upload Excel File', self)
-		subtitleLabel = QtGui.QLabel('Click browse to select an experiment to upload', self)
+		titleLabel = QtGui.QLabel('Upload Config File', self)
+		subtitleLabel = QtGui.QLabel('Click browse to select a previously saved configurations file', self)
 
 		# Add two labels to layout
 		layout.addWidget(titleLabel)
@@ -46,7 +46,7 @@ class LoadFileWidget(QtGui.QWidget):
 	# go to next view to select data attributes
 	def switchViews(self):
 		fileName = self.fileTextEdit.text()
-		self.window.showLoadConfigView(fileName)
+		self.window.showSlideMetricsView(fileName)
 
 	# open a file dialog to pick an xlsx input file
 	def selectFile(self):
