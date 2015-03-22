@@ -60,6 +60,7 @@ class Window(QtGui.QMainWindow):
     lookzone_attrs = attrs['lookzone'];
     slide_attrs = attrs['slide'];
 
+    # Then if there is a config file to load, load it
     saved_slide = []
     saved_lookzone = []
     if len(configFilePath):

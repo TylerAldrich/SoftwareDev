@@ -121,7 +121,7 @@ class SaveFileWidget(QtGui.QWidget):
   def selectConfigLoc(self):
     save_config_dialog = QtGui.QFileDialog(self)
     save_config_dialog.setFileMode(QtGui.QFileDialog.AnyFile)
-    save_config_dialog.setNameFilter(self.tr("Excel (*.ipatch)"))
+    save_config_dialog.setNameFilter(self.tr("iPatch (*.ipatch)"))
     save_config_dialog.setDefaultSuffix("ipatch")
     if save_config_dialog.exec_():
       files = list(save_config_dialog.selectedFiles())
