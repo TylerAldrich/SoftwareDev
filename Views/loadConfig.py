@@ -33,6 +33,8 @@ class LoadConfigWidget(QtGui.QWidget):
 		# Init text edit box for file path and browse button to
 		# find the file.  Set browse button on click to selectFile function
 		self.fileTextEdit = QtGui.QLineEdit()
+		if len(self.window.configFilePath):
+			self.fileTextEdit.setText(self.window.configFilePath)
 		browseButton = QtGui.QPushButton('Browse')
 		browseFileLayout.addWidget(self.fileTextEdit)
 		browseFileLayout.addWidget(browseButton)
@@ -46,6 +48,7 @@ class LoadConfigWidget(QtGui.QWidget):
 	# go to next view to select data attributes
 	def switchViews(self):
 		fileName = self.fileTextEdit.text()
+		self.window.configFilePath = fileName
 		self.window.showSlideMetricsView(fileName)
 
 	# open a file dialog to pick an xlsx input file

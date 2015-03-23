@@ -24,6 +24,7 @@ class Window(QtGui.QMainWindow):
     self.appVersion = 'v0.1'
     # save a Dict that caches the state of certain GUI elements 
     self.guiState = {}
+    self.configFilePath = ''
     self.initUI()
 
   def initUI(self):
@@ -72,8 +73,9 @@ class Window(QtGui.QMainWindow):
     self.setCentralWidget(self.selectAttributesWidget)
 
   # Function to show the screen for selecting a configuration file
-  def showLoadConfigView(self, experimentFilePath):
-    self.experimentFilePath = experimentFilePath
+  def showLoadConfigView(self, experimentFilePath=None):
+    if experimentFilePath:
+      self.experimentFilePath = experimentFilePath
     loadConfig = LoadConfigWidget(self)
     self.setCentralWidget(loadConfig)
 

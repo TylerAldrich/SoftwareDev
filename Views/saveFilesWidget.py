@@ -92,13 +92,13 @@ class SaveFileWidget(QtGui.QWidget):
   # go to next view to select data attributes
   def switchViews(self):
 
-    slideFileName = self.fileTextEdit.text()
-    if len(self.slide_attrs) > 0 and len(slideFileName):
+    if len(self.slide_attrs) > 0:
+      slideFileName = self.fileTextEdit.text()
       # Save slide metrics data
       self.window.saveSlideMetricsData(slideFileName, self.slide_attrs)
 
-    lookzoneFileName = self.lookzoneFileEdit.text()
-    if len(self.lookzone_attrs) > 0 and len(lookzoneFileName):
+    if len(self.lookzone_attrs) > 0:
+      lookzoneFileName = self.lookzoneFileEdit.text()
       # Save Lookzone metrics data
       self.window.saveLookzoneData(lookzoneFileName, self.lookzone_attrs)
 
