@@ -16,6 +16,7 @@ class SlideMetricsAttrListsComponent(AttributeListsComponent):
     'Pupil y diameter std dev',
     'Average pupil x diameter'
     ]
-  def __init__(self, window, attrs):
+  def __init__(self, window, attrs, saved_attrs):
     self.__class__.attr_list = attrs
+    self.__class__.saved_attrs = saved_attrs
     AttributeListsComponent.__init__(self, window)

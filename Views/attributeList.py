@@ -129,7 +129,7 @@ class AttributeListsComponent(QtGui.QWidget):
 	def loadState(self):
 		# if there is no saved state, create a new one for this view
 		if not self.window.guiState.has_key(self.__class__.guiStateKey):
-			self.window.guiState[self.__class__.guiStateKey] = { 'chooseAttrsItems': self.__class__.attr_list, 'selectedAttrsItems': [], 'filter': '' }
+			self.window.guiState[self.__class__.guiStateKey] = { 'chooseAttrsItems': self.__class__.attr_list, 'selectedAttrsItems': self.__class__.saved_attrs, 'filter': '' }
 
 		self.attributes = self.window.guiState[self.__class__.guiStateKey]['chooseAttrsItems']
 		self.filter = self.window.guiState[self.__class__.guiStateKey]['filter']
