@@ -53,8 +53,8 @@ class Window(QtGui.QMainWindow):
     else:
       event.ignore()
 
-  # Function to show the screen for selecting slide metric attributes 
-  def showSlideMetricsView(self, configFilePath):
+  # Function to show the screen for selecting attributes 
+  def showSelectAttributesView(self):
     # First parse the experiment from the saved file path
     self.reader = WorkbookReader(str(self.experimentFilePath))
     attrs = self.reader.get_attributes()
@@ -64,8 +64,8 @@ class Window(QtGui.QMainWindow):
     # Then if there is a config file to load, load it
     saved_slide = []
     saved_lookzone = []
-    if len(configFilePath):
-      saved_attrs = Configuration.read_config_file(configFilePath)
+    if len(self.configFilePath):
+      saved_attrs = Configuration.read_config_file(self.configFilePath)
       saved_slide = saved_attrs['slide']
       saved_lookzone = saved_attrs['lookzone']
 

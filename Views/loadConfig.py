@@ -49,7 +49,7 @@ class LoadConfigWidget(QtGui.QWidget):
 	def switchViews(self):
 		fileName = self.fileTextEdit.text()
 		self.window.configFilePath = fileName
-		self.window.showSlideMetricsView(fileName)
+		self.window.showSelectAttributesView()
 
 	# open a file dialog to pick an xlsx input file
 	def selectFile(self):
