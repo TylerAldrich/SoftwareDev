@@ -1,6 +1,7 @@
 import xlrd
 import pprint
 import pdb
+import re
 from metrics import Metrics, Lookzone, Slidemetrics
 
 class WorkbookReader():
@@ -36,17 +37,29 @@ class WorkbookReader():
             # Loop through slide metrics
             while sheet.cell_value(row,0) != "LOOKZONE METRICS:":
                 if sheet.cell_type(row,0) == 1 : # Found a slide metric
-                    slide_attrs.add(sheet.cell_value(row,0)) # add that slide metric
+                    value = sheet.cell_value(row,0)
+                    if self._valid_slidemetric_value(value):
+                        slide_attrs.add(value) # add that slide metric
                 row += 1
             row += 1  # increment one more time for next section
             # loop through rest of file (lookzones)
             while row < sheet.nrows:
                 if sheet.cell_type(row,0) == 1: # Found a lookzone
-                    lookzone_attrs.add(sheet.cell_value(row,0))
+                    value = sheet.cell_value(row,0)
+                    if self._valid_lookzone_value(value):
+                        lookzone_attrs.add(value)
                 row += 1
 
+        lookzone_attrs = sorted(list(lookzone_attrs))
+        slide_attrs = sorted(list(slide_attrs))
         return {"lookzone" : lookzone_attrs, "slide" : slide_attrs} # return as hash
 
+
+    def _valid_lookzone_value(self, v):
+        return not re.match("ATT_.*|LookZone.*|LOOKZONE.*|Vertex.*", v)
+
+    def _valid_slidemetric_value(self, v):
+        return v != "SLIDE METRICS:"
 
     ##### Sheet Methods ####
 
