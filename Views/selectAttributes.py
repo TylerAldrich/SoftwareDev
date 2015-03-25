@@ -47,8 +47,8 @@ class SelectAttributesWidget(QtGui.QWidget):
 
   # Switches to output config view
   def goToOutputConfigView(self):
-    selected_slide_attrs = self.slideMetricsTab.getItemsFromListView(self.slideMetricsTab.selectedListWidget)
-    selected_lookzone_attrs = self.lookzoneTab.getItemsFromListView(self.lookzoneTab.selectedListWidget)
+    selected_slide_attrs = self.slideMetricsTab.getFinalChosenAttrs(self.slideMetricsTab.selectedListWidget)
+    selected_lookzone_attrs = self.lookzoneTab.getFinalChosenAttrs(self.lookzoneTab.selectedListWidget)
     self.window.showSaveFilesView(selected_slide_attrs, selected_lookzone_attrs)
     # Save state of lists in view
     self.slideMetricsTab.saveState()

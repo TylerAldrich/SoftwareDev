@@ -86,9 +86,13 @@ class SaveFileWidget(QtGui.QWidget):
     # Add horizontal layout to overall layout
     layout.addLayout(browseConfigFileLayout)
 
-    navigation = NavigationWidget(self.window, None, self.switchViews)
+    navigation = NavigationWidget(self.window, self.goBack, self.switchViews)
     layout.addWidget(navigation)
 
+  # go back to attribute selection view
+  def goBack(self):
+    self.window.showSelectAttributesView()
+  
   # go to next view to select data attributes
   def switchViews(self):
 
