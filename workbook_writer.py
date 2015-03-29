@@ -4,11 +4,14 @@ from workbook_reader import WorkbookReader
 
 class WorkbookWriter():
     def __init__(self, readers, output, attributes):
-        """ Instantiated with a list of workbook_readers, filename for lookzone output, and 
+        """ Instantiated with a list of workbook_readers, filename for lookzone output, and
         filename for slide metrics output, and a list of attributes"""
         self.readers = readers
         self.output = output
         self.attributes = attributes
+        self.book = xlwt.Workbook() # Create the book
+        self.attribute_sheets = {}
+        self.header_to_col_num = {}
 
     def write_reader(self, reader):
         """Writes data for individual reader"""
@@ -19,6 +22,13 @@ class WorkbookWriter():
         """ Write header for sheet """
         # TODO: We will have to separate writing header and data in Iteration 2
         pass
+
+    def write_readers(self):
+        self.write_headers(self.readers)
+        row_num = 1
+        for reader in self.readers:
+            self.write_reader(reader, row_num)
+            row_num += 1
 
     def write_first_reader(self):
         """ This method prints only the first reader of the writer """
@@ -34,47 +44,79 @@ class LookzoneWriter(WorkbookWriter):
         """
         WorkbookWriter.__init__(self,readers,output,attrs)
 
-    def write_reader(self, reader):
-        """ Write data for individual reader.
-        @Params: reader - WorkbookReader """
-        book = xlwt.Workbook() # Create the book
-        subject_id = reader.get_subject_id()
+
+    def write_headers(self, readers):
+        """ Write header for sheet """
         for attribute in self.attributes: # Create sheet for each attribute
             sheet_name = attribute.replace('/', "'d") # Sheet names do not support slashes
             if len(sheet_name) > 31:
               sheet_name = sheet_name[:26]
               sheet_name += '...'
-            write_sheet = book.add_sheet(sheet_name) # Create the sheet
+            write_sheet = self.book.add_sheet(sheet_name) # Create the sheet
+            self.attribute_sheets[attribute] = write_sheet # store right sheet to get later
 
             # Set up sheets headers
             write_sheet.write(0, 0, 'SubjectID')
             row_num = 0
             col_num = 1
+            col_names = set()
+            for reader in readers:
+                current_lookzone_num = 1
+                for stat in reader._stat_sheets:
+                    for lookzone in reader.get_lookzones(stat):
+                        col_name = self.__get_header(stat, lookzone, current_lookzone_num)
+                        current_lookzone_num += 1
+
+                        if col_name not in col_names:
+                            col_names.add(col_name)
+
+                    current_lookzone_num = 1
+
+            col_names = sorted(list(col_names))
+            for col_name in col_names:
+                write_sheet.write(row_num, col_num, col_name)
+                if attribute not in self.header_to_col_num:
+                    self.header_to_col_num[attribute] = {}
+                self.header_to_col_num[attribute][col_name] = col_num
+                col_num += 1
+
+    def __get_header(self, stat, lookzone, lz_num):
+        """ Returns header for a given stat sheet and lookzone object """
+        sheet_name = stat.name.split('.')[0]
+
+        if "OUTSIDE" in lookzone.name: # last lookzone of the file
+            col_name = "%s_outside" % sheet_name
+        else:
+            col_name = "%s_LZ%s" % (sheet_name, str(lz_num))
+
+        return col_name
+
+
+    def write_reader(self, reader, row_num):
+        """ Write data for individual reader.
+        @Params: reader - WorkbookReader """
+        subject_id = reader.get_subject_id()
+        for attribute in self.attributes: # Create sheet for each attribute
+            write_sheet = self.attribute_sheets[attribute]
+
+            # Add data for the subject
+            write_sheet.write(row_num, 0, subject_id)
             current_lookzone_num = 1
             for stat in reader._stat_sheets:
                 for lookzone in reader.get_lookzones(stat):
-                    sheet_name = stat.name.split('.')[0]
-
-                    if "OUTSIDE" in lookzone.name: # last lookzone of the file
-                        col_name = "%s_outside" % sheet_name
-                    else:
-                        col_name = "%s_LZ%s" % (sheet_name, str(current_lookzone_num))
-                        current_lookzone_num += 1
-
-                    write_sheet.write(row_num, col_num, col_name)
-                    col_num += 1
-                current_lookzone_num = 1
-
-            # Add data for the subject
-            write_sheet.write(1, 0, subject_id)
-            row_num = 1
-            col_num = 1
-            for stat in reader._stat_sheets:
-                for lookzone in reader.get_lookzones(stat):
                     if lookzone.has_attribute(attribute): # only add if attr exists
+                        col_name = self.__get_header(stat, lookzone, current_lookzone_num)
+                        col_num = self.header_to_col_num[attribute][col_name]
                         write_sheet.write(row_num,col_num,lookzone.value_for_attribute(attribute))
-                    col_num += 1
-        book.save(self.output)
+                    current_lookzone_num += 1
+                current_lookzone_num = 1
+        self.book.save(self.output)
+"""
+mapping from column header -> column number
+get column header for each lookzone we go through
+get column number to write that data to
+repeat
+"""
 
 class SlideMetricWriter(WorkbookWriter):
     def __init__(self, readers, output, attrs):
@@ -85,40 +127,51 @@ class SlideMetricWriter(WorkbookWriter):
         """
         WorkbookWriter.__init__(self,readers,output,attrs)
 
-    def write_reader(self, reader):
-        """ Write data for individual reader.
-        @Params: reader - WorkbookReader """
-        book = xlwt.Workbook() # Create the book
-        subject_id = reader.get_subject_id()
+    def __get_header(self, stat):
+        """ Returns header for a given stat sheet and lookzone object """
+        sheet_name = stat.name.split('.')[0]
+        return sheet_name
 
-        for attribute in self.attributes: # Create sheet for each attribute
+    def write_headers(self, readers):
+        for attribute in self.attributes:
             sheet_name = attribute.replace('/', "'d") # Sheet names do not support slashes
             if len(sheet_name) > 31:
               sheet_name = sheet_name[:26]
               sheet_name += '...'
-            write_sheet = book.add_sheet(sheet_name) # Create the sheet
-            #slidemetric = get_slidemetrics(self, write_sheet)
+            write_sheet = self.book.add_sheet(sheet_name) # Create the sheet
+            self.attribute_sheets[attribute] = write_sheet # store right sheet to get later
+
             # Set up sheets headers
             write_sheet.write(0, 0, 'SubjectID')
-            row_num = 0
-            col_num = 1
-            current_slidemetric_num = 1
-            for stat in reader._stat_sheets:
-                sheet_name = stat.name.split('.')[0]
-                col_name =  sheet_name
-                current_slidemetric_num += 1
-                write_sheet.write(row_num, col_num, col_name)
-                col_num += 1
-                current_lookzone_num = 1
+            col_names = set()
+            for reader in readers:
+                for stat in reader._stat_sheets:
+                    col_name = self.__get_header(stat)
+                    col_names.add(col_name)
 
+            col_num = 1
+            row_num = 0
+            for col_name in col_names:
+                write_sheet.write(row_num, col_num, col_name)
+                if attribute not in self.header_to_col_num:
+                    self.header_to_col_num[attribute] = {}
+                self.header_to_col_num[attribute][col_name] = col_num
+                col_num += 1
+
+    def write_reader(self, reader, row_num):
+        """ Write data for individual reader.
+        @Params: reader - WorkbookReader """
+        subject_id = reader.get_subject_id()
+        for attribute in self.attributes:
+            write_sheet = self.attribute_sheets[attribute]
             # Add data for the subject
-            write_sheet.write(1, 0, subject_id)
-            row_num = 1
+            write_sheet.write(row_num, 0, subject_id)
             col_num = 1
             for stat in reader._stat_sheets:
                 slidemetric = reader.get_slidemetrics(stat)
                 if slidemetric.has_attribute(attribute): # only add if attr exists
+                    col_name = self.__get_header(stat)
+                    col_num = self.header_to_col_num[attribute][col_name]
                     write_sheet.write(row_num,col_num,slidemetric.value_for_attribute(attribute))
-                col_num += 1
-        book.save(self.output)
-   	
+        self.book.save(self.output)
+
