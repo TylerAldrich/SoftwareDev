@@ -27,7 +27,7 @@ class Configuration():
 
     def print_config_file(self):
         """ Prints the current configuration file """
-        f = open("{}.ipatch".format(self._filename), 'w')
+        f = open("{}".format(self._filename), 'w')
         self.print_attributes(self._lookzone_attrs,"LOOKZONE:",f)
         self.print_attributes(self._slide_attrs,"SLIDE:",f)
         f.close()
