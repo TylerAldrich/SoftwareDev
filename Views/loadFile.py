@@ -40,13 +40,20 @@ class LoadFileWidget(QtGui.QWidget):
 
 		# Add horizontal layout to overall layout
 		layout.addLayout(browseFileLayout)
+
+		self.errorMsgLabel = QtGui.QLabel('')
+		layout.addWidget(self.errorMsgLabel)
 		navigation = NavigationWidget(self.window, None, self.switchViews)
 		layout.addWidget(navigation)
 
 	# go to next view to select data attributes
 	def switchViews(self):
 		fileName = self.fileTextEdit.text()
-		self.window.showLoadConfigView(fileName)
+		# TODO: Make application open file path at this point and validate input so we can show error on this screen
+		if len(fileName):
+			self.window.showLoadConfigView(fileName)
+		else:
+			self.errorMsgLabel.setText('<b style="color:red">No input file was selected. Please choose an input Excel file to continue.</b>')
 
 	# open a file dialog to pick an xlsx input file
 	def selectFile(self):

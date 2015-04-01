@@ -7,6 +7,7 @@ from PyQt4 import QtGui, QtCore
 from Views.selectAttributes import SelectAttributesWidget
 from Views.loadFile import LoadFileWidget
 from Views.saveFilesWidget import SaveFileWidget
+from Views.sessionDoneWidget import SessionDoneWidget
 from Views.loadConfig import LoadConfigWidget
 from Views.slideMetricsAttrLists import SlideMetricsAttrListsComponent
 from Views.lookzoneAttrLists import LookzoneAttrListsComponent
@@ -53,6 +54,9 @@ class Window(QtGui.QMainWindow):
     else:
       event.ignore()
 
+  def closeApp(self):
+    self.close()
+
   # Function to show the screen for selecting attributes 
   def showSelectAttributesView(self):
     # First parse the experiment from the saved file path
@@ -89,17 +93,21 @@ class Window(QtGui.QMainWindow):
     saveFilesView = SaveFileWidget(self, slide_attrs, lookzone_attrs)
     self.setCentralWidget(saveFilesView)
 
+  def showDoneView(self, slideFilePath, lookzoneFilePath, configFilePath):
+    doneView = SessionDoneWidget(self, slideFilePath, lookzoneFilePath, configFilePath)
+    self.setCentralWidget(doneView)
+
   ## Function to save slide metric attributes
   def saveSlideMetricsData(self, filePath, attrs):
     if len(attrs) > 0:
       slide_writer = SlideMetricWriter([self.reader], filePath, attrs)
-      slide_writer.write_first_reader()
+      slide_writer.write_readers()
 
   ## Function to save lookzone attributes
   def saveLookzoneData(self, filePath, attrs):
     if len(attrs) > 0:
       lookzone_writer = LookzoneWriter([self.reader], filePath, attrs)
-      lookzone_writer.write_first_reader()
+      lookzone_writer.write_readers()
 
 	## Function to save the configuration file
   def saveConfigFile(self, filePath, slide_attrs, lookzone_attrs):
