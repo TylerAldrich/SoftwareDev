@@ -4,6 +4,7 @@
 import sys
 from sys import argv
 from PyQt4 import QtGui, QtCore
+from filePathWidget import FilePathWidget
 from navigation import NavigationWidget
 
 # Widget that has user browse for an input file
@@ -40,17 +41,47 @@ class LoadFileWidget(QtGui.QWidget):
 
     # Add horizontal layout to overall layout
     layout.addLayout(browseFileLayout)
+
+    # Add vertical layout that will contain list of files
+    self.files_list_layout = QtGui.QVBoxLayout(self)
+    layout.addLayout(self.files_list_layout)
+
+    # Add navigation to layout
     navigation = NavigationWidget(self.window, None, self.switchViews)
     layout.addWidget(navigation)
 
   # go to next view to select data attributes
   def switchViews(self):
     fileName = self.fileTextEdit.text()
-    self.window.showLoadConfigView(fileName)
+    self.window.showLoadConfigView(self.file_names)
 
   # open a file dialog to pick an xlsx input file
   def selectFile(self):
     select_dialog = QtGui.QFileDialog(self)
     select_dialog.setFileMode(QtGui.QFileDialog.AnyFile)
-    file_names = map(str, select_dialog.getOpenFileNames())
-    self.fileTextEdit.setText(str(file_names))
+    self.file_names = map(str, select_dialog.getOpenFileNames())
+
+    # If there is only one file, fill the text box with the path
+    # otherwise show all files below text box
+    if len(self.file_names) > 1:
+      self.fileTextEdit.setText("")
+      self.updateListOfFiles()
+    else:
+      self.fileTextEdit.setText(self.file_names[0])
+
+  # Method to update the view of all the files
+  def updateListOfFiles(self):
+    # First clear out all views already there
+    for i in reversed(range(self.files_list_layout.count())):
+      self.files_list_layout.itemAt(i).widget().setParent(None)
+
+    # Then add each file path to the view
+    for file_path in self.file_names:
+      file_label = FilePathWidget(file_path, self)
+      self.files_list_layout.addWidget(file_label)
+
+  # Method to remove a given file name
+  def removeFile(self, file_path):
+    # Remove the file name from the list and update the view
+    self.file_names.remove(file_path)
+    self.updateListOfFiles()
