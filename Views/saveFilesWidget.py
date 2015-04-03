@@ -15,6 +15,9 @@ class SaveFileWidget(QtGui.QWidget):
     self.window = window
     self.slide_attrs = slide_attrs
     self.lookzone_attrs = lookzone_attrs
+    self.slideFileName = ''
+    self.lookzoneFileName = ''
+    self.configFileName = ''
     self.initUI()
 
   def initUI(self):
@@ -46,7 +49,7 @@ class SaveFileWidget(QtGui.QWidget):
     ## Save lookzone section
     if len(self.lookzone_attrs) > 0:
       lookTitleLabel = QtGui.QLabel('Save Lookzone File', self)
-      lookSubtitleLabel = QtGui.QLabel('Click browse to select a location to save your Lookzone data', self)
+      lookSubtitleLabel = QtGui.QLabel('Click browse to select a location to save your LookZone data', self)
 
       # Add two labels to layout
       layout.addWidget(lookTitleLabel)
@@ -66,8 +69,10 @@ class SaveFileWidget(QtGui.QWidget):
       layout.addLayout(browseLookzoneFileLayout)
 
     ## Save config file section
-    configTitleLabel = QtGui.QLabel('Make Configurations File', self)
-    configSubtitleLabel = QtGui.QLabel('Create a configurations file to save these selected attributes for a later experiment', self)
+    configTitleLabel = QtGui.QLabel('Make Configurations File <b>(Optional)</b>', self)
+    configSubtitleLabel = QtGui.QLabel('Choose a location to create a configurations file to save these selected attributes for a later experiment', self)
+    # TODO: swap previous line with next one once we figure out QLabel wrapping
+    # configSubtitleLabel = QtGui.QLabel('Choose a location to create a configurations file to save these selected attributes for a later experiment. This is recommended in order to save you time in the future - simply load this configuration file next time you start a session and all your chosen attributes will be pre-selected for you.', self)
 
     # Add two labels to layout
     layout.addWidget(configTitleLabel)
@@ -89,30 +94,33 @@ class SaveFileWidget(QtGui.QWidget):
     navigation = NavigationWidget(self.window, self.goBack, self.switchViews)
     layout.addWidget(navigation)
 
+  def writeOutputs(self):
+    if len(self.slide_attrs) > 0:
+      self.slideFileName = self.fileTextEdit.text()
+      # Save slide metrics data
+      self.window.saveSlideMetricsData(self.slideFileName, self.slide_attrs)
+
+    if len(self.lookzone_attrs) > 0:
+      self.lookzoneFileName = self.lookzoneFileEdit.text()
+      # Save Lookzone metrics data
+      self.window.saveLookzoneData(self.lookzoneFileName, self.lookzone_attrs)
+
+    self.configFileName = self.configFileEdit.text()
+    if len(self.configFileName):
+      # Save the attributes in a configuration file
+      self.window.saveConfigFile(self.configFileName, self.slide_attrs, self.lookzone_attrs)
+
   # go back to attribute selection view
   def goBack(self):
     self.window.showSelectAttributesView()
   
   # go to next view to select data attributes
   def switchViews(self):
-
-    if len(self.slide_attrs) > 0:
-      slideFileName = self.fileTextEdit.text()
-      # Save slide metrics data
-      self.window.saveSlideMetricsData(slideFileName, self.slide_attrs)
-
-    if len(self.lookzone_attrs) > 0:
-      lookzoneFileName = self.lookzoneFileEdit.text()
-      # Save Lookzone metrics data
-      self.window.saveLookzoneData(lookzoneFileName, self.lookzone_attrs)
-
-    configFileName = self.configFileEdit.text()
-    if len(configFileName):
-      # Save the attributes in a configuration file
-			self.window.saveConfigFile(configFileName, self.slide_attrs, self.lookzone_attrs)
-
+    self.writeOutputs()
+    # We want to clear the chosen attributes when starting a new session
     self.window.clearAttributesState()
-    self.window.showLoadFileView()
+    # TODO: We would show progress bar view instead, which would go to Done only on success
+    self.window.showDoneView(self.slideFileName, self.lookzoneFileName, self.configFileName)
 
   # open a file dialog to pick an xlsx input file for lookzone data
   def selectLookzoneLoc(self):
