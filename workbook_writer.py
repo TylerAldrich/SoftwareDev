@@ -12,6 +12,7 @@ class WorkbookWriter():
         self.book = xlwt.Workbook() # Create the book
         self.attribute_sheets = {}
         self.header_to_col_num = {}
+        self.sheet_names = {}
 
     def write_reader(self, reader):
         """Writes data for individual reader"""
@@ -28,6 +29,20 @@ class WorkbookWriter():
         row_num = 1
         for reader in self.readers:
             self.write_reader(reader, row_num)
+            row_num += 1
+        self.write_key()
+        self.book.save(self.output)
+
+    def write_key(self):
+        """ Writes mapping from sheet # -> full sheet name """
+        key_sheet = self.book.add_sheet("Key")
+
+        row_num = 1
+        key_sheet.write(0, 0, 'Key')
+        key_sheet.write(0, 1, 'Full Sheet Name')
+        for key, name in self.sheet_names.iteritems():
+            key_sheet.write(row_num, 0, str(key))
+            key_sheet.write(row_num, 1, name)
             row_num += 1
 
     def write_first_reader(self):
@@ -47,8 +62,12 @@ class LookzoneWriter(WorkbookWriter):
 
     def write_headers(self, readers):
         """ Write header for sheet """
+        sheet_count = 0
         for attribute in self.attributes: # Create sheet for each attribute
-            sheet_name = attribute.replace('/', "'d") # Sheet names do not support slashes
+            sheet_count += 1
+            self.sheet_names[sheet_count] = attribute # store original sheet name for Key
+            sheet_name = attribute.replace('/', "") # Sheet names do not support slashes
+            sheet_name = "%s-%s" % (str(sheet_count), sheet_name)
             if len(sheet_name) > 31:
               sheet_name = sheet_name[:26]
               sheet_name += '...'
@@ -110,7 +129,6 @@ class LookzoneWriter(WorkbookWriter):
                         write_sheet.write(row_num,col_num,lookzone.value_for_attribute(attribute))
                     current_lookzone_num += 1
                 current_lookzone_num = 1
-        self.book.save(self.output)
 """
 mapping from column header -> column number
 get column header for each lookzone we go through
@@ -133,8 +151,12 @@ class SlideMetricWriter(WorkbookWriter):
         return sheet_name
 
     def write_headers(self, readers):
-        for attribute in self.attributes:
-            sheet_name = attribute.replace('/', "'d") # Sheet names do not support slashes
+        sheet_count = 0
+        for attribute in self.attributes: # Create sheet for each attribute
+            sheet_count += 1
+            self.sheet_names[sheet_count] = attribute # store original sheet name for Key
+            sheet_name = attribute.replace('/', "") # Sheet names do not support slashes
+            sheet_name = "%s-%s" % (str(sheet_count), sheet_name)
             if len(sheet_name) > 31:
               sheet_name = sheet_name[:26]
               sheet_name += '...'
@@ -173,5 +195,4 @@ class SlideMetricWriter(WorkbookWriter):
                     col_name = self.__get_header(stat)
                     col_num = self.header_to_col_num[attribute][col_name]
                     write_sheet.write(row_num,col_num,slidemetric.value_for_attribute(attribute))
-        self.book.save(self.output)
 
