@@ -21,30 +21,51 @@ class LoadFileWidget(QtGui.QWidget):
     layout = QtGui.QVBoxLayout(self)
     layout.setAlignment(QtCore.Qt.AlignTop)
 
-    titleLabel = QtGui.QLabel('Upload Excel File', self)
-    subtitleLabel = QtGui.QLabel('Click browse to select an experiment to upload', self)
+    title_label = QtGui.QLabel('<b>Upload Excel File</b>', self)
+    subtitle_label = QtGui.QLabel('Click browse to select an experiment to upload', self)
+    title_label.setWordWrap(True)
+    subtitle_label.setWordWrap(True)
 
     # Add two labels to layout
-    layout.addWidget(titleLabel)
-    layout.addWidget(subtitleLabel)
+    layout.addWidget(title_label)
+    layout.addWidget(subtitle_label)
 
     # Horizontal layout is for the text box and browse button
-    browseFileLayout = QtGui.QHBoxLayout(self)
+    browse_file_layout = QtGui.QHBoxLayout(self)
 
     # Init text edit box for file path and browse button to
     # find the file.  Set browse button on click to selectFile function
     self.fileTextEdit = QtGui.QLineEdit()
-    browseButton = QtGui.QPushButton('Browse')
-    browseFileLayout.addWidget(self.fileTextEdit)
-    browseFileLayout.addWidget(browseButton)
-    browseButton.clicked.connect(self.selectFile)
+    browse_button = QtGui.QPushButton('Browse')
+    browse_file_layout.addWidget(self.fileTextEdit)
+    browse_file_layout.addWidget(browse_button)
+    browse_button.clicked.connect(self.selectFile)
 
     # Add horizontal layout to overall layout
-    layout.addLayout(browseFileLayout)
+    layout.addLayout(browse_file_layout)
 
     # Add vertical layout that will contain list of files
-    self.files_list_layout = QtGui.QVBoxLayout(self)
-    layout.addLayout(self.files_list_layout)
+    scroll_view = QtGui.QScrollArea(self)
+    scroll_view.setWidgetResizable(True)
+    scroll_view_contents = QtGui.QWidget(scroll_view)
+    scroll_view.setWidget(scroll_view_contents)
+
+    self.files_list_layout = QtGui.QVBoxLayout(scroll_view_contents)
+    layout.addWidget(scroll_view)
+
+    # Section for clear all buttons and add more files button
+    add_remove_layout = QtGui.QHBoxLayout(self)
+    self.clear_all_button = QtGui.QPushButton('Clear All')
+    self.clear_all_button.clicked.connect(self.clearAllFiles)
+    self.add_file_button = QtGui.QPushButton('Add Another File')
+    self.add_file_button.clicked.connect(self.addAnotherFile)
+    self.clear_all_button.hide()
+    self.add_file_button.hide()
+
+    # Add buttons to layout and layout to view
+    add_remove_layout.addWidget(self.clear_all_button)
+    add_remove_layout.addWidget(self.add_file_button)
+    layout.addLayout(add_remove_layout)
 
     self.errorMsgLabel = QtGui.QLabel('')
     layout.addWidget(self.errorMsgLabel)
@@ -63,9 +84,9 @@ class LoadFileWidget(QtGui.QWidget):
 
   # open a file dialog to pick an xlsx input file
   def selectFile(self):
-    select_dialog = QtGui.QFileDialog(self)
-    select_dialog.setFileMode(QtGui.QFileDialog.AnyFile)
-    self.file_names = map(str, select_dialog.getOpenFileNames())
+    self.clearErrorMessage()
+
+    self.file_names = self.showFileDialog()
 
     # If there is only one file, fill the text box with the path
     # otherwise show all files below text box
@@ -74,6 +95,13 @@ class LoadFileWidget(QtGui.QWidget):
       self.updateListOfFiles()
     else:
       self.fileTextEdit.setText(self.file_names[0])
+
+  # Method to show a file dialog and returns a list of chosen file names
+  def showFileDialog(self):
+    select_dialog = QtGui.QFileDialog(self)
+    select_dialog.setFileMode(QtGui.QFileDialog.AnyFile)
+    files = map(str, select_dialog.getOpenFileNames())
+    return files
 
   # Method to update the view of all the files
   def updateListOfFiles(self):
@@ -86,8 +114,47 @@ class LoadFileWidget(QtGui.QWidget):
       file_label = FilePathWidget(file_path, self)
       self.files_list_layout.addWidget(file_label)
 
+    # Check length of file list, if none, hide clear all and add buttons
+    if len(self.file_names) == 0:
+      self.clear_all_button.hide()
+      self.add_file_button.hide()
+    else:
+      self.clear_all_button.show()
+      self.add_file_button.show()
+
   # Method to remove a given file name
   def removeFile(self, file_path):
+    self.clearErrorMessage()
+
     # Remove the file name from the list and update the view
     self.file_names.remove(file_path)
     self.updateListOfFiles()
+
+  # Method to clear all of the added files
+  def clearAllFiles(self):
+    self.clearErrorMessage()
+
+    # Clear out the list of file names then update the view
+    del self.file_names[:]
+    self.updateListOfFiles()
+
+  # Method to add another file to the already chosen list
+  def addAnotherFile(self):
+    self.clearErrorMessage()
+
+    added_files = self.showFileDialog()
+
+    # If the added file has already been added, yell at them
+    for added_file in added_files:
+      if added_file in self.file_names:
+        # throw error
+        self.errorMsgLabel.setText('<b style="color:red">File has already been added, cannot add same file twice.</b>')
+      else:
+        self.file_names.append(added_file)
+
+    # update the view of course!
+    self.updateListOfFiles()
+
+  # Method to just clear out the error message after another click occurs
+  def clearErrorMessage(self):
+    self.errorMsgLabel.setText('')
