@@ -21,12 +21,14 @@ class LoadFileWidget(QtGui.QWidget):
     layout = QtGui.QVBoxLayout(self)
     layout.setAlignment(QtCore.Qt.AlignTop)
 
-    titleLabel = QtGui.QLabel('Upload Excel File', self)
-    subtitleLabel = QtGui.QLabel('Click browse to select an experiment to upload', self)
+    title_label = QtGui.QLabel('<b>Upload Excel File</b>', self)
+    subtitle_label = QtGui.QLabel('Click browse to select an experiment to upload', self)
+    title_label.setWordWrap(True)
+    subtitle_label.setWordWrap(True)
 
     # Add two labels to layout
-    layout.addWidget(titleLabel)
-    layout.addWidget(subtitleLabel)
+    layout.addWidget(title_label)
+    layout.addWidget(subtitle_label)
 
     # Horizontal layout is for the text box and browse button
     browse_file_layout = QtGui.QHBoxLayout(self)
