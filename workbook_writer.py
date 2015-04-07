@@ -44,7 +44,7 @@ class WorkbookWriter():
             key_sheet.write(0, 0, 'Key')
             key_sheet.write(0, 1, 'Full Sheet Name')
         except:
-            raise IPatchException("Could not write to file")
+            raise IPatchException("Could not write to Key sheet")
         for key, name in self.sheet_names.iteritems():
             key_sheet.write(row_num, 0, str(key))
             key_sheet.write(row_num, 1, name)
@@ -98,7 +98,10 @@ class LookzoneWriter(WorkbookWriter):
 
             col_names = sorted(list(col_names))
             for col_name in col_names:
-                write_sheet.write(row_num, col_num, col_name)
+                try:
+                    write_sheet.write(row_num, col_num, col_name)
+                except:
+                    raise IPatchException("Could not write header: {0}".format(col_name))
                 if attribute not in self.header_to_col_num:
                     self.header_to_col_num[attribute] = {}
                 self.header_to_col_num[attribute][col_name] = col_num
@@ -182,7 +185,10 @@ class SlideMetricWriter(WorkbookWriter):
             col_num = 1
             row_num = 0
             for col_name in col_names:
-                write_sheet.write(row_num, col_num, col_name)
+                try:
+                    write_sheet.write(row_num, col_num, col_name)
+                except:
+                    raise IPatchException("Could not write header: {0}".format(col_name))
                 if attribute not in self.header_to_col_num:
                     self.header_to_col_num[attribute] = {}
                 self.header_to_col_num[attribute][col_name] = col_num
