@@ -4,6 +4,9 @@ import pdb
 import re
 from metrics import Metrics, Lookzone, Slidemetrics
 
+LOOKZONE_STRING = "LOOKZONE METRICS:"
+SLIDE_STRING    = "SLIDE METRICS:"
+
 class WorkbookReader():
     """ Wraps the xlrd Book object """
     def __init__(self, workbook_file):
@@ -35,7 +38,7 @@ class WorkbookReader():
         for sheet in self._stat_sheets:
             row = 0
             # Loop through slide metrics
-            while sheet.cell_value(row,0) != "LOOKZONE METRICS:":
+            while sheet.cell_value(row,0) != LOOKZONE_STRING:
                 if sheet.cell_type(row,0) == 1 : # Found a slide metric
                     value = sheet.cell_value(row,0)
                     if self._valid_slidemetric_value(value):
@@ -59,7 +62,7 @@ class WorkbookReader():
         return not re.match("ATT_.*|LookZone.*|LOOKZONE.*|Vertex.*", v)
 
     def _valid_slidemetric_value(self, v):
-        return v != "SLIDE METRICS:"
+        return v != SLIDE_STRING
 
     ##### Sheet Methods ####
 
@@ -67,7 +70,7 @@ class WorkbookReader():
         """ Return an Array of Lookzones for the given sheet """
         row = 0
         lookzones = []
-        while sheet.cell_value(row,0) != "LOOKZONE METRICS:": # Loop until first lookzone
+        while sheet.cell_value(row,0) != LOOKZONE_STRING: # Loop until first lookzone
             row = row + 1
         row = row + 1
 
@@ -86,11 +89,11 @@ class WorkbookReader():
         """Return the slide metric object for the given sheet"""
         row = 0
         slidemetric = Slidemetrics("blah")
-        while sheet.cell_value(row,0) != "SLIDE METRICS:": # Loop until first slide metric
+        while sheet.cell_value(row,0) != SLIDE_STRING: # Loop until first slide metric
             row = row + 1
         row = row + 1
 
-        while sheet.cell_value(row,0) != "LOOKZONE METRICS:":
+        while sheet.cell_value(row,0) != LOOKZONE_STRING:
             if sheet.cell_type(row,0) == 1 : # Found a slide metric
                 slidemetric.add_value_for_attribute(sheet.cell_value(row,5),sheet.cell_value(row,0))
             #elif sheet.cell_type(row,0) == 1:

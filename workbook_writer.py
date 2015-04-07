@@ -2,6 +2,8 @@ import xlwt
 from metrics import Metrics, Lookzone, Slidemetrics
 from workbook_reader import WorkbookReader
 
+MAX_SHEET_NAME_LENGTH = 31
+
 class WorkbookWriter():
     def __init__(self, readers, output, attributes):
         """ Instantiated with a list of workbook_readers, filename for lookzone output, and
@@ -21,7 +23,6 @@ class WorkbookWriter():
 
     def write_headers(self, sheet):
         """ Write header for sheet """
-        # TODO: We will have to separate writing header and data in Iteration 2
         pass
 
     def write_readers(self):
@@ -68,7 +69,7 @@ class LookzoneWriter(WorkbookWriter):
             self.sheet_names[sheet_count] = attribute # store original sheet name for Key
             sheet_name = attribute.replace('/', "") # Sheet names do not support slashes
             sheet_name = "%s-%s" % (str(sheet_count), sheet_name)
-            if len(sheet_name) > 31:
+            if len(sheet_name) > MAX_SHEET_NAME_LENGTH:
               sheet_name = sheet_name[:26]
               sheet_name += '...'
             write_sheet = self.book.add_sheet(sheet_name) # Create the sheet
@@ -157,7 +158,7 @@ class SlideMetricWriter(WorkbookWriter):
             self.sheet_names[sheet_count] = attribute # store original sheet name for Key
             sheet_name = attribute.replace('/', "") # Sheet names do not support slashes
             sheet_name = "%s-%s" % (str(sheet_count), sheet_name)
-            if len(sheet_name) > 31:
+            if len(sheet_name) > MAX_SHEET_NAME_LENGTH:
               sheet_name = sheet_name[:26]
               sheet_name += '...'
             write_sheet = self.book.add_sheet(sheet_name) # Create the sheet
