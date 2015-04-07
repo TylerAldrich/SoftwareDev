@@ -3,6 +3,7 @@ import pprint
 import pdb
 import re
 from metrics import Metrics, Lookzone, Slidemetrics
+from ipatch_exception import IPatchException
 
 LOOKZONE_STRING = "LOOKZONE METRICS:"
 SLIDE_STRING    = "SLIDE METRICS:"
@@ -10,7 +11,12 @@ SLIDE_STRING    = "SLIDE METRICS:"
 class WorkbookReader():
     """ Wraps the xlrd Book object """
     def __init__(self, workbook_file):
-        self.workbook = xlrd.open_workbook(workbook_file)
+        try:
+            self.workbook = xlrd.open_workbook(workbook_file)
+        except IOError as e:
+            raise IPatchException("File does not exist")
+        except:
+            raise IPatchException("File could not be opened") 
         self._stat_sheets = []
         self._data_dict = {}
         self.workbook_filename = workbook_file
@@ -72,6 +78,8 @@ class WorkbookReader():
         lookzones = []
         while sheet.cell_value(row,0) != LOOKZONE_STRING: # Loop until first lookzone
             row = row + 1
+            if row >= sheet.nrows: # looped through entire sheet
+                raise IPatchException("Incorrectly Formated Worksheet") # don't loop forever
         row = row + 1
 
         while row < sheet.nrows:
@@ -91,6 +99,8 @@ class WorkbookReader():
         slidemetric = Slidemetrics("blah")
         while sheet.cell_value(row,0) != SLIDE_STRING: # Loop until first slide metric
             row = row + 1
+            if row >= sheet.nrows: # means we looped through entire sheet
+                raise IPatchException("Incorrectly Formated Worksheet") # don't loop forever
         row = row + 1
 
         while sheet.cell_value(row,0) != LOOKZONE_STRING:
