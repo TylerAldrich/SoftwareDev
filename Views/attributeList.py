@@ -4,6 +4,7 @@
 import sys
 from sys import argv
 from PyQt4 import QtGui, QtCore
+from collections import OrderedDict
 
 # set up UI for two list horizontally aligned listviews
 # to display attributes to choose and chosen ones.
@@ -12,6 +13,7 @@ class AttributeListsComponent(QtGui.QWidget):
     QtGui.QWidget.__init__(self)
     self.window = window
     self.loadState()
+    self.attributes_are_chosen = self.initAttributesState()
     self.initUI()
 
   def initUI(self):
@@ -36,6 +38,19 @@ class AttributeListsComponent(QtGui.QWidget):
     layout.addLayout(attributesView)
     # filter on initial load in case loading a prior state
     self.filterAttributes()
+
+  # initialize a dict keeping track of whether each attribute is chosen or not
+  def initAttributesState(self):
+    attrs_are_chosen = OrderedDict()
+    num_attrs = len(self.attributes)
+    for i in xrange(num_attrs):
+      attrs_are_chosen[self.attributes[i]] = False
+
+    num_selected_attrs = len(self.selectedAttributes)
+    for i in xrange(num_selected_attrs):
+      attrs_are_chosen[self.selectedAttributes[i]] = True
+
+    return attrs_are_chosen
 
   # construct and return a widget containing a filter box
   def makeSearch(self, filterFunction, filter):
@@ -119,14 +134,17 @@ class AttributeListsComponent(QtGui.QWidget):
     selectedItems = self.chooseListWidget.selectedItems()
     selectedList = []
     for i in selectedItems:
+      self.attributes_are_chosen[str(i.text())] = True
       self.chooseListWidget.setItemHidden(i, True)
       self.selectedListWidget.setItemHidden(self.getMatchingItemFromList(i, self.selectedListWidget), False)
+    self.filterChosen()
 
   # move selected attrs in selected list to the choose list
   def removeAttribute(self):
     selectedItems = self.selectedListWidget.selectedItems()
     removedList = []
     for i in selectedItems:
+      self.attributes_are_chosen[str(i.text())] = False
       self.chooseListWidget.setItemHidden(self.getMatchingItemFromList(i, self.chooseListWidget), False)
       self.selectedListWidget.setItemHidden(i, True)
     self.filterAttributes()
@@ -190,7 +208,7 @@ class AttributeListsComponent(QtGui.QWidget):
     # but don't show attributes hidden due to being visible in the selected list
     for index in xrange(self.chooseListWidget.count()):
       listItem = self.chooseListWidget.item(index)
-      isHidden = listItem not in searchedItems or self.itemIsVisibleInList(self.selectedListWidget, listItem)
+      isHidden = listItem not in searchedItems or self.attributes_are_chosen[str(listItem.text())]
       self.chooseListWidget.setItemHidden(listItem, isHidden)
 
   # Filter the chose attributes
@@ -201,7 +219,7 @@ class AttributeListsComponent(QtGui.QWidget):
     # but don't show attributes hidden due to being visible in the selected list
     for index in xrange(self.selectedListWidget.count()):
       listItem = self.selectedListWidget.item(index)
-      isHidden = listItem not in searchedItems or self.itemIsVisibleInList(self.chooseListWidget, listItem)
+      isHidden = listItem not in searchedItems or not self.attributes_are_chosen[str(listItem.text())]
       self.selectedListWidget.setItemHidden(listItem, isHidden)
 
   # Finds an item in given list with the same text and returns it, returns None if no matches
@@ -259,8 +277,6 @@ class AttributeListsComponent(QtGui.QWidget):
   def clearAllAttrs(self):
     for i in xrange(self.selectedListWidget.count()):
       item = self.selectedListWidget.item(i)
-      if self.itemIsVisibleInList(self.selectedListWidget, item):
-        self.chooseListWidget.setItemHidden(self.getMatchingItemFromList(item, self.chooseListWidget), False)
-        self.selectedListWidget.setItemHidden(item, True)
+      self.attributes_are_chosen[str(item.text())] = False
     self.filterAttributes()
     self.filterChosen()
