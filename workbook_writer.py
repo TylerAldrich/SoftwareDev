@@ -1,6 +1,9 @@
 import xlwt
 from metrics import Metrics, Lookzone, Slidemetrics
 from workbook_reader import WorkbookReader
+from ipatch_exception import IPatchException
+
+MAX_SHEET_NAME_LENGTH = 31
 
 class WorkbookWriter():
     def __init__(self, readers, output, attributes):
@@ -21,7 +24,6 @@ class WorkbookWriter():
 
     def write_headers(self, sheet):
         """ Write header for sheet """
-        # TODO: We will have to separate writing header and data in Iteration 2
         pass
 
     def write_readers(self):
@@ -38,8 +40,11 @@ class WorkbookWriter():
         key_sheet = self.book.add_sheet("Key")
 
         row_num = 1
-        key_sheet.write(0, 0, 'Key')
-        key_sheet.write(0, 1, 'Full Sheet Name')
+        try:
+            key_sheet.write(0, 0, 'Key')
+            key_sheet.write(0, 1, 'Full Sheet Name')
+        except:
+            raise IPatchException("Could not write to Key sheet")
         for key, name in self.sheet_names.iteritems():
             key_sheet.write(row_num, 0, str(key))
             key_sheet.write(row_num, 1, name)
@@ -68,7 +73,7 @@ class LookzoneWriter(WorkbookWriter):
             self.sheet_names[sheet_count] = attribute # store original sheet name for Key
             sheet_name = attribute.replace('/', "") # Sheet names do not support slashes
             sheet_name = "%s-%s" % (str(sheet_count), sheet_name)
-            if len(sheet_name) > 31:
+            if len(sheet_name) > MAX_SHEET_NAME_LENGTH:
               sheet_name = sheet_name[:26]
               sheet_name += '...'
             write_sheet = self.book.add_sheet(sheet_name) # Create the sheet
@@ -93,7 +98,10 @@ class LookzoneWriter(WorkbookWriter):
 
             col_names = sorted(list(col_names))
             for col_name in col_names:
-                write_sheet.write(row_num, col_num, col_name)
+                try:
+                    write_sheet.write(row_num, col_num, col_name)
+                except:
+                    raise IPatchException("Could not write header: {0}".format(col_name))
                 if attribute not in self.header_to_col_num:
                     self.header_to_col_num[attribute] = {}
                 self.header_to_col_num[attribute][col_name] = col_num
@@ -126,7 +134,10 @@ class LookzoneWriter(WorkbookWriter):
                     if lookzone.has_attribute(attribute): # only add if attr exists
                         col_name = self.__get_header(stat, lookzone, current_lookzone_num)
                         col_num = self.header_to_col_num[attribute][col_name]
-                        write_sheet.write(row_num,col_num,lookzone.value_for_attribute(attribute))
+                        try:
+                            write_sheet.write(row_num,col_num,lookzone.value_for_attribute(attribute))
+                        except:
+                            raise IPatchException("Could not write attribute: {0}".format(attribute))
                     current_lookzone_num += 1
                 current_lookzone_num = 1
 """
@@ -157,7 +168,7 @@ class SlideMetricWriter(WorkbookWriter):
             self.sheet_names[sheet_count] = attribute # store original sheet name for Key
             sheet_name = attribute.replace('/', "") # Sheet names do not support slashes
             sheet_name = "%s-%s" % (str(sheet_count), sheet_name)
-            if len(sheet_name) > 31:
+            if len(sheet_name) > MAX_SHEET_NAME_LENGTH:
               sheet_name = sheet_name[:26]
               sheet_name += '...'
             write_sheet = self.book.add_sheet(sheet_name) # Create the sheet
@@ -174,7 +185,10 @@ class SlideMetricWriter(WorkbookWriter):
             col_num = 1
             row_num = 0
             for col_name in col_names:
-                write_sheet.write(row_num, col_num, col_name)
+                try:
+                    write_sheet.write(row_num, col_num, col_name)
+                except:
+                    raise IPatchException("Could not write header: {0}".format(col_name))
                 if attribute not in self.header_to_col_num:
                     self.header_to_col_num[attribute] = {}
                 self.header_to_col_num[attribute][col_name] = col_num
@@ -194,5 +208,8 @@ class SlideMetricWriter(WorkbookWriter):
                 if slidemetric.has_attribute(attribute): # only add if attr exists
                     col_name = self.__get_header(stat)
                     col_num = self.header_to_col_num[attribute][col_name]
-                    write_sheet.write(row_num,col_num,slidemetric.value_for_attribute(attribute))
+                    try:
+                        write_sheet.write(row_num,col_num,slidemetric.value_for_attribute(attribute))
+                    except:
+                        raise IPatchException("Could not write value for attribute: {0}".format(attribute))
 
