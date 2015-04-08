@@ -42,12 +42,11 @@ class Window(QtGui.QMainWindow):
     self.showLoadFileView()
 
   def set_style(self):
-    current_path = os.path.dirname(os.path.realpath(__file__))
-    stylesheet = os.path.join(
-            os.environ.get(
-                "_MEIPASS@",
-                current_path),
-            'ipatch_style.stylesheet')
+    try:
+        current_path = sys._MEIPASS
+    except Exception:
+        current_path = os.path.dirname(os.path.realpath(__file__))
+    stylesheet = os.path.join(current_path, 'ipatch_style.stylesheet')
     f = open(stylesheet, 'r')
     self.style_data = f.read()
     f.close()
