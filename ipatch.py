@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import os
 from sys import argv
 from PyQt4 import QtGui, QtCore
 from Views.selectAttributes import SelectAttributesWidget
@@ -25,7 +26,7 @@ class Window(QtGui.QMainWindow):
     self.appVersion = 'v0.1'
     self.appWidth = 700
     self.appHeight = 500
-    # save a Dict that caches the state of certain GUI elements 
+    # save a Dict that caches the state of certain GUI elements
     self.guiState = {}
     # the config file should persist through views so save it in window
     self.configFilePath = ''
@@ -41,7 +42,9 @@ class Window(QtGui.QMainWindow):
     self.showLoadFileView()
 
   def set_style(self):
-    f = open('ipatch_style.stylesheet', 'r')
+    current_path = os.path.dirname(os.path.realpath(__file__))
+    stylesheet = os.path.join(current_path, 'ipatch_style.stylesheet')
+    f = open(stylesheet, 'r')
     self.style_data = f.read()
     f.close()
     self.setStyleSheet(self.style_data)
@@ -71,7 +74,7 @@ class Window(QtGui.QMainWindow):
   def closeApp(self):
     self.close()
 
-  # Function to show the screen for selecting attributes 
+  # Function to show the screen for selecting attributes
   def showSelectAttributesView(self, experimentFilePaths=None):
     if experimentFilePaths:
       self.experimentFilePaths = experimentFilePaths
