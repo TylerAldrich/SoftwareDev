@@ -2,6 +2,7 @@ import xlrd
 import pprint
 import pdb
 import re
+import os
 from metrics import Metrics, Lookzone, Slidemetrics
 from ipatch_exception import IPatchException
 
@@ -16,7 +17,7 @@ class WorkbookReader():
         except IOError as e:
             raise IPatchException("File does not exist")
         except:
-            raise IPatchException("File could not be opened") 
+            raise IPatchException("File could not be opened")
         self._stat_sheets = []
         self._data_dict = {}
         self.workbook_filename = workbook_file
@@ -33,7 +34,7 @@ class WorkbookReader():
     def get_subject_id(self):
         """ Return subject id (first numbers in file name)"""
         # get xls filename (end of path x/y/z/123-foo.xls)
-        filename = self.workbook_filename.split('/')[-1]
+        filename = self.workbook_filename.split(os.sep)[-1]
         return filename.split('-')[0].strip()
 
     def get_attributes(self):
