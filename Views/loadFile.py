@@ -6,6 +6,9 @@ from sys import argv
 from PyQt4 import QtGui, QtCore
 from filePathWidget import FilePathWidget
 from navigation import NavigationWidget
+from heading_label import HeadingLabel
+from empty_list_label import EmptyListLabel
+from error_msg_label import ErrorMsgLabel
 
 # Widget that has user browse for an input file
 class LoadFileWidget(QtGui.QWidget):
@@ -14,6 +17,7 @@ class LoadFileWidget(QtGui.QWidget):
   def __init__(self, window):
     QtGui.QWidget.__init__(self)
     self.window = window
+    self.file_names = []
     self.initUI()
 
   def initUI(self):
@@ -21,8 +25,8 @@ class LoadFileWidget(QtGui.QWidget):
     layout = QtGui.QVBoxLayout(self)
     layout.setAlignment(QtCore.Qt.AlignTop)
 
-    title_label = QtGui.QLabel('<b>Upload Excel File</b>', self)
-    subtitle_label = QtGui.QLabel('Click browse to select an experiment to upload', self)
+    title_label = HeadingLabel('Choose Experiment Files')
+    subtitle_label = QtGui.QLabel('Click browse to select at least one experiment (Excel file). Shift or Ctrl click to select multiple.', self)
     title_label.setWordWrap(True)
     subtitle_label.setWordWrap(True)
 
@@ -51,6 +55,8 @@ class LoadFileWidget(QtGui.QWidget):
     scroll_view.setWidget(scroll_view_contents)
 
     self.files_list_layout = QtGui.QVBoxLayout(scroll_view_contents)
+    self.no_files_label = EmptyListLabel('No input files yet')
+    self.files_list_layout.addWidget(self.no_files_label)
     layout.addWidget(scroll_view)
 
     # Section for clear all buttons and add more files button
@@ -67,20 +73,70 @@ class LoadFileWidget(QtGui.QWidget):
     add_remove_layout.addWidget(self.add_file_button)
     layout.addLayout(add_remove_layout)
 
-    self.errorMsgLabel = QtGui.QLabel('')
+    self.errorMsgLabel = ErrorMsgLabel('')
     layout.addWidget(self.errorMsgLabel)
 
+    self.showLoadConfigCheckbox = QtGui.QCheckBox('Load attributes from iPatch configuration file')
+    self.showLoadConfigCheckbox.stateChanged.connect(self.showLoadConfig)
+
+    layout.addWidget(self.showLoadConfigCheckbox)
+
+    self.loadConfig = self.makeLoadConfig()
+    layout.addWidget(self.loadConfig)
+
+    layout.addWidget(self.loadConfig)
     # Add navigation to layout
     navigation = NavigationWidget(self.window, None, self.switchViews)
     layout.addWidget(navigation)
+  
+  def selectConfigFile(self):
+    self.configFileTextEdit.setText(QtGui.QFileDialog.getOpenFileName())
+
+  def makeLoadConfig(self):
+    widget = QtGui.QWidget(self)
+    # Create initial vertical layout
+    layout = QtGui.QVBoxLayout(widget)
+    layout.setAlignment(QtCore.Qt.AlignTop)
+
+    subtitleLabel = QtGui.QLabel('Click browse to select a previously saved configurations file', self)
+    layout.addWidget(subtitleLabel)
+
+    # Horizontal layout is for the text box and browse button
+    browseFileLayout = QtGui.QHBoxLayout(self)
+
+    # Init text edit box for file path and browse button to
+    # find the file.  Set browse button on click to selectFile function
+    self.configFileTextEdit = QtGui.QLineEdit()
+    if len(self.window.configFilePath):
+      self.configFileTextEdit.setText(self.window.configFilePath)
+    browseButton = QtGui.QPushButton('Browse')
+    browseFileLayout.addWidget(self.configFileTextEdit)
+    browseFileLayout.addWidget(browseButton)
+    browseButton.clicked.connect(self.selectConfigFile)
+
+    # Add horizontal layout to overall layout
+    layout.addLayout(browseFileLayout)
+    widget.hide()
+    return widget
+
+  def showLoadConfig(self, state):
+    if state == QtCore.Qt.Checked:
+      # show the load config file widgets
+      self.loadConfig.show()
+    else:
+      self.loadConfig.hide()
 
   # go to next view to select data attributes
   def switchViews(self):
     # TODO: Make application open file path at this point and validate input so we can show error on this screen
     if len(self.file_names):
-      self.window.showLoadConfigView(self.file_names)
+      # self.window.showLoadConfigView(self.file_names)
+      configFilePath = self.configFileTextEdit.text()
+      if len(configFilePath):
+        self.window.configFilePath = configFilePath
+      self.window.showSelectAttributesView(self.file_names)
     else:
-      self.errorMsgLabel.setText('<b style="color:red">No input file was selected. Please choose an input Excel file to continue.</b>')
+      self.errorMsgLabel.setText('No input file was selected. Please choose at least one input file to continue.')
 
   # open a file dialog to pick an xlsx input file
   def selectFile(self):
@@ -88,13 +144,8 @@ class LoadFileWidget(QtGui.QWidget):
 
     self.file_names = self.showFileDialog()
 
-    # If there is only one file, fill the text box with the path
-    # otherwise show all files below text box
-    if len(self.file_names) > 1:
-      self.fileTextEdit.setText("")
-      self.updateListOfFiles()
-    else:
-      self.fileTextEdit.setText(self.file_names[0])
+    self.fileTextEdit.setText("")
+    self.updateListOfFiles()
 
   # Method to show a file dialog and returns a list of chosen file names
   def showFileDialog(self):
@@ -118,6 +169,7 @@ class LoadFileWidget(QtGui.QWidget):
     if len(self.file_names) == 0:
       self.clear_all_button.hide()
       self.add_file_button.hide()
+      self.files_list_layout.addWidget(self.no_files_label)
     else:
       self.clear_all_button.show()
       self.add_file_button.show()
@@ -148,7 +200,7 @@ class LoadFileWidget(QtGui.QWidget):
     for added_file in added_files:
       if added_file in self.file_names:
         # throw error
-        self.errorMsgLabel.setText('<b style="color:red">File has already been added, cannot add same file twice.</b>')
+        self.errorMsgLabel.setText('File has already been added, cannot add same file twice.')
       else:
         self.file_names.append(added_file)
 

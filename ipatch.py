@@ -23,18 +23,32 @@ class Window(QtGui.QMainWindow):
     super(Window, self).__init__()
     self.appName = 'iPatch'
     self.appVersion = 'v0.1'
+    self.appWidth = 700
+    self.appHeight = 500
     # save a Dict that caches the state of certain GUI elements 
     self.guiState = {}
+    # the config file should persist through views so save it in window
     self.configFilePath = ''
+    self.set_style()
     self.initUI()
 
   def initUI(self):
-    self.resize(700, 500)
+    self.resize(self.appWidth, self.appHeight)
     self.center()
     self.setWindowTitle(self.appName + ' ' + self.appVersion)
     self.show()
     # Load up the Load file view
     self.showLoadFileView()
+
+  def set_style(self):
+    f = open('ipatch_style.stylesheet', 'r')
+    self.style_data = f.read()
+    f.close()
+    self.setStyleSheet(self.style_data)
+
+  # def setCentralWidget(self, widget):
+  #   widget.setStyleSheet(self.style_data)
+  #   super(Window, self).setCentralWidget(widget)
 
   # Function to center the window on screen
   def center(self):
@@ -58,7 +72,9 @@ class Window(QtGui.QMainWindow):
     self.close()
 
   # Function to show the screen for selecting attributes 
-  def showSelectAttributesView(self):
+  def showSelectAttributesView(self, experimentFilePaths=None):
+    if experimentFilePaths:
+      self.experimentFilePaths = experimentFilePaths
     # For each file in the list of files, create a reader and get all of its attributes
     saved_slide = set()
     saved_lookzone = set()

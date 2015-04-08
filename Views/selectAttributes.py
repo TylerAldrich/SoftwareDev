@@ -39,7 +39,7 @@ class SelectAttributesWidget(QtGui.QWidget):
 
   # Switches back to loading input file view
   def goToSetupView(self):
-    self.window.showLoadConfigView()
+    self.window.showLoadFileView()
     # Since going back to file selection requires file analysis before
     # coming back to this screen, clear state of chosen attributes
     self.slideMetricsTab.clearState()

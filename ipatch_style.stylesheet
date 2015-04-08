@@ -1,0 +1,69 @@
+QMainWindow
+{
+  background-color: #e9eaed;
+}
+/*
+QWidget
+{
+    color: #000000;
+    background-color: #dadde1;
+    selection-background-color:#78879b;
+    selection-color: black;
+    background-clip: border;
+    border-image: none;
+    outline: 0;
+    margin: 0;
+    padding: 0;
+}
+*/
+QWidget:item:hover
+{
+    background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1,
+    stop: 0 #78879b, stop: 1 #78879b);
+    color: black;
+}
+QWidget:item:selected
+{
+    background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1,
+    stop: 0 #78879b, stop: 1 #78879b);
+}
+QWidget:focus, QMenuBar:focus
+{
+    border: 1px solid rgba(48, 86, 111);
+}
+QPushButton
+{
+    color: #FFFFFF;
+    background-color: #5b74ae;
+    border-radius: 4;
+    padding: 5px;
+    font-size: 14px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+HeadingLabel
+{
+  color: #495778;
+  font-weight: bold;
+  font-size: 18px;
+}
+EmptyListLabel
+{
+  color: #bdc8e4;
+  font-weight: bold;
+  font-size: 28px;
+}
+ErrorMsgLabel
+{
+  color: red;
+}
+QPushButton:pressed
+{
+    background-color: #495778;
+}
+
+QPushButton:hover
+{
+    border: 2px solid #c9b27b;
+}
