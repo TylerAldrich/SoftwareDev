@@ -70,12 +70,12 @@ class TestWorkbookMethods(unittest.TestCase):
             self.assertTrue(self.workbook2.get_slidemetrics(sheet).has_attribute(checked_attr))
 
     def test_get_attributes(self):
-        # Test that the hash includes two values: slide and lookzone. 
+        # Test that the hash includes two values: slide and lookzone.
         # Verify that each of these contains a set with the correct
         # number of values
         hsh_len = 2
-        slide_len = 38
-        lookzone_len = 120
+        slide_len = 37
+        lookzone_len = 56
 
         attrs1 = self.workbook1.get_attributes()
         attrs2 = self.workbook2.get_attributes()
@@ -100,7 +100,7 @@ class TestWorkbookMethods(unittest.TestCase):
         output_path = "./Test_Files/TestLookzoneOutput.xls"
         expected_output_path = "./Test_Files/ExpectedLookzoneOutput.xls"
         lookzone_writer = LookzoneWriter([self.workbook1],output_path,["Width", "Appears"])
-        lookzone_writer.write_first_reader()
+        lookzone_writer.write_readers()
         expected_book = xlrd.open_workbook(expected_output_path)
         resulting_book = xlrd.open_workbook(output_path)
 
@@ -113,12 +113,40 @@ class TestWorkbookMethods(unittest.TestCase):
         expected_output_path = "./Test_Files/ExpectedSlideMetricOutput.xls"
         test_attrs = ["Percent time tracked", "Average pupil area", "Number of fixations"]
         slide_writer = SlideMetricWriter([self.workbook1],output_path,test_attrs)
-        slide_writer.write_first_reader()
+        slide_writer.write_readers()
         expected_book = xlrd.open_workbook(expected_output_path)
         resulting_book = xlrd.open_workbook(output_path)
 
         self.assertTrue(self.books_equal(expected_book,resulting_book))
 
+    def test_write_multiple_lookzones(self):
+        # Test the output of LookZoneWriter to that of an
+        # Expected output file
+        output_path = "./Test_Files/TestMultiLookzoneOutput.xls"
+        expected_output_path = "./Test_Files/ExpectedMultiLookzoneOutput.xls"
+        test_attrs = ["Width", "Appears", "Gazepoint count"]
+        lookzone_writer = LookzoneWriter([self.workbook1, self.workbook2], output_path, test_attrs)
+        lookzone_writer.write_readers()
+        expected_book = xlrd.open_workbook(expected_output_path)
+        resulting_book = xlrd.open_workbook(output_path)
+
+        self.assertTrue(self.books_equal(expected_book,resulting_book))
+
+    def test_write_multiple_slide_metrics(self):
+        # Test the output of SlideMetricWriter to that of an
+        # Expected output file
+        output_path = "./Test_Files/TestMultiSlideMetricOutput.xls"
+        expected_output_path = "./Test_Files/ExpectedMultiSlideMetricOutput.xls"
+        test_attrs = ["Percent time tracked", "Average pupil area", "Number of fixations"]
+        slide_writer = SlideMetricWriter([self.workbook1, self.workbook2], output_path, test_attrs)
+        slide_writer.write_readers()
+        expected_book = xlrd.open_workbook(expected_output_path)
+        resulting_book = xlrd.open_workbook(output_path)
+
+        self.assertTrue(self.books_equal(expected_book,resulting_book))
+
+    # TODO : Get real data files with varying amounts of information (like kimberly has,
+    # with a bunch of blanks and stuff) and create tests for that
 
 if __name__ == '__main__':
     unittest.main()
