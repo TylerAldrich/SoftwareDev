@@ -27,24 +27,7 @@ class SaveFileWidget(QtGui.QWidget):
 
 		## Save Slide metrics section
     if len(self.slide_attrs) > 0:
-      titleLabel = QtGui.QLabel('Save Slide Metrics File', self)
-      subtitleLabel = QtGui.QLabel('Click browse to select a location to save your Slide Metrics data', self)
-
-      # Add two labels to layout
-      layout.addWidget(titleLabel)
-      layout.addWidget(subtitleLabel)
-
-      # Horizontal layout is for the text box and browse button
-      browseFileLayout = QtGui.QHBoxLayout(self)
-      # Init text edit box for file path and browse button to
-      # find the file.  Set browse button on click to selectFile function
-      self.fileTextEdit = QtGui.QLineEdit()
-      browseButton = QtGui.QPushButton('Browse')
-      browseFileLayout.addWidget(self.fileTextEdit)
-      browseFileLayout.addWidget(browseButton)
-      browseButton.clicked.connect(self.selectSlideLoc)
-
-      layout.addLayout(browseFileLayout)
+      layout.addLayout(self.makeSlideBrowseOutput())
 
     ## Save lookzone section
     if len(self.lookzone_attrs) > 0:
@@ -67,6 +50,9 @@ class SaveFileWidget(QtGui.QWidget):
       browseLookzoneButton.clicked.connect(self.selectLookzoneLoc)
       # Add horizontal layout to overall layout
       layout.addLayout(browseLookzoneFileLayout)
+
+      self.lookzoneErrorMsgLabel = QtGui.QLabel('')
+      layout.addWidget(self.lookzoneErrorMsgLabel)
 
     ## Save config file section
     configTitleLabel = QtGui.QLabel('Make Configurations File <b>(Optional)</b>', self)
@@ -94,14 +80,39 @@ class SaveFileWidget(QtGui.QWidget):
     navigation = NavigationWidget(self.window, self.goBack, self.switchViews)
     layout.addWidget(navigation)
 
+  def makeSlideBrowseOutput(self):
+    layout = QtGui.QVBoxLayout(self)
+
+    titleLabel = QtGui.QLabel('Save Slide Metrics File', self)
+    subtitleLabel = QtGui.QLabel('Click browse to select a location to save your Slide Metrics data', self)
+
+    # Add two labels to layout
+    layout.addWidget(titleLabel)
+    layout.addWidget(subtitleLabel)
+
+    # Horizontal layout is for the text box and browse button
+    browseFileLayout = QtGui.QHBoxLayout(self)
+    # Init text edit box for file path and browse button to
+    # find the file.  Set browse button on click to selectFile function
+    self.fileTextEdit = QtGui.QLineEdit()
+    browseButton = QtGui.QPushButton('Browse')
+    browseFileLayout.addWidget(self.fileTextEdit)
+    browseFileLayout.addWidget(browseButton)
+    browseButton.clicked.connect(self.selectSlideLoc)
+
+    layout.addLayout(browseFileLayout)
+
+    self.slideErrorMsgLabel = QtGui.QLabel('')
+    layout.addWidget(self.slideErrorMsgLabel)
+    
+    return layout;
+
   def writeOutputs(self):
     if len(self.slide_attrs) > 0:
-      self.slideFileName = self.fileTextEdit.text()
       # Save slide metrics data
       self.window.saveSlideMetricsData(self.slideFileName, self.slide_attrs)
 
     if len(self.lookzone_attrs) > 0:
-      self.lookzoneFileName = self.lookzoneFileEdit.text()
       # Save Lookzone metrics data
       self.window.saveLookzoneData(self.lookzoneFileName, self.lookzone_attrs)
 
@@ -114,13 +125,33 @@ class SaveFileWidget(QtGui.QWidget):
   def goBack(self):
     self.window.showSelectAttributesView()
   
+  def validateInputs(self):
+    foundError = False
+
+    if len(self.slide_attrs) > 0:
+      self.slideFileName = self.fileTextEdit.text()
+
+      if not len(self.slideFileName):
+        self.slideErrorMsgLabel.setText('<b style="color:red">You must select an output location for Slide Metrics.</b>')
+        foundError = True
+
+    if len(self.lookzone_attrs) > 0:
+      self.lookzoneFileName = self.lookzoneFileEdit.text()
+
+      if not len(self.lookzoneFileName):
+        self.lookzoneErrorMsgLabel.setText('<b style="color:red">You must select an output location for LookZone Data.</b>')
+        foundError = True
+
+    return not foundError
+
   # go to next view to select data attributes
   def switchViews(self):
-    self.writeOutputs()
-    # We want to clear the chosen attributes when starting a new session
-    self.window.clearAttributesState()
-    # TODO: We would show progress bar view instead, which would go to Done only on success
-    self.window.showDoneView(self.slideFileName, self.lookzoneFileName, self.configFileName)
+    if self.validateInputs():
+      self.writeOutputs()
+      # We want to clear the chosen attributes when starting a new session
+      self.window.clearAttributesState()
+      # TODO: We would show progress bar view instead, which would go to Done only on success
+      self.window.showDoneView(self.slideFileName, self.lookzoneFileName, self.configFileName)
 
   # open a file dialog to pick an xlsx input file for lookzone data
   def selectLookzoneLoc(self):
