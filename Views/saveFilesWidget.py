@@ -1,8 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import sys
-import re
+import sys, re, os
 from sys import argv
 from PyQt4 import QtGui, QtCore
 from navigation import NavigationWidget
@@ -26,6 +25,9 @@ class SaveFileWidget(QtGui.QWidget):
     layout = QtGui.QVBoxLayout(self)
     layout.setAlignment(QtCore.Qt.AlignTop)
 
+    # Get the current directory to prepopulate the file lines
+    self.current_directory = os.path.dirname(os.path.realpath(__file__)) + '/'
+
 		## Save Slide metrics section
     if len(self.slide_attrs) > 0:
       layout.addLayout(self.makeSlideBrowseOutput())
@@ -45,6 +47,7 @@ class SaveFileWidget(QtGui.QWidget):
       # Init text edit box for file path and browse button to
       # find the file.  Set browse button on click to selectFile function
       self.lookzoneFileEdit = QtGui.QLineEdit()
+      self.lookzoneFileEdit.setText(self.current_directory)
       browseLookzoneButton = QtGui.QPushButton('Browse')
       browseLookzoneFileLayout.addWidget(self.lookzoneFileEdit)
       browseLookzoneFileLayout.addWidget(browseLookzoneButton)
@@ -96,6 +99,7 @@ class SaveFileWidget(QtGui.QWidget):
     # Init text edit box for file path and browse button to
     # find the file.  Set browse button on click to selectFile function
     self.fileTextEdit = QtGui.QLineEdit()
+    self.fileTextEdit.setText(self.current_directory)
     browseButton = QtGui.QPushButton('Browse')
     browseFileLayout.addWidget(self.fileTextEdit)
     browseFileLayout.addWidget(browseButton)

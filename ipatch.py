@@ -42,6 +42,11 @@ class Window(QtGui.QMainWindow):
     # Load up the Load file view
     self.showLoadFileView()
 
+    # Add a menu bar where the user can start over or quit
+    menu = self.menuBar().addMenu('File')
+    menu.addAction('New Experiment', self.start_new)
+    menu.addAction('Quit', self.closeApp)
+
   def set_style(self):
     try:
         current_path = sys._MEIPASS
@@ -52,10 +57,6 @@ class Window(QtGui.QMainWindow):
     self.style_data = f.read()
     f.close()
     self.setStyleSheet(self.style_data)
-
-  # def setCentralWidget(self, widget):
-  #   widget.setStyleSheet(self.style_data)
-  #   super(Window, self).setCentralWidget(widget)
 
   # Function to center the window on screen
   def center(self):
@@ -77,6 +78,15 @@ class Window(QtGui.QMainWindow):
 
   def closeApp(self):
     self.close()
+
+  def start_new(self):
+    reply = QtGui.QMessageBox.question(self, 'Message',
+      "Are you sure you want to start a new session?", QtGui.QMessageBox.Yes |
+      QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+
+    if reply == QtGui.QMessageBox.Yes:
+      self.clearAttributesState()
+      self.showLoadFileView()
 
   # Function to show the screen for selecting attributes
   def showSelectAttributesView(self, experimentFilePaths=None):
