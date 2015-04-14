@@ -12,6 +12,8 @@ from Views.sessionDoneWidget import SessionDoneWidget
 from Views.loadConfig import LoadConfigWidget
 from Views.slideMetricsAttrLists import SlideMetricsAttrListsComponent
 from Views.lookzoneAttrLists import LookzoneAttrListsComponent
+from Views.load_progress import LoadProgress
+from Views.load_progress import ReadInputFilesThread
 from workbook_reader import WorkbookReader
 from workbook_writer import SlideMetricWriter, LookzoneWriter
 from configuration import Configuration
@@ -52,10 +54,6 @@ class Window(QtGui.QMainWindow):
     f.close()
     self.setStyleSheet(self.style_data)
 
-  # def setCentralWidget(self, widget):
-  #   widget.setStyleSheet(self.style_data)
-  #   super(Window, self).setCentralWidget(widget)
-
   # Function to center the window on screen
   def center(self):
     qr = self.frameGeometry()
@@ -77,34 +75,6 @@ class Window(QtGui.QMainWindow):
   def closeApp(self):
     self.close()
 
-  # Function to show the screen for selecting attributes
-  def showSelectAttributesView(self, experimentFilePaths=None):
-    if experimentFilePaths:
-      self.experimentFilePaths = experimentFilePaths
-    # For each file in the list of files, create a reader and get all of its attributes
-    saved_slide = set()
-    saved_lookzone = set()
-    self.all_readers = []
-    for filePath in self.experimentFilePaths:
-      print str(filePath)
-      # First parse the experiment from the saved file path
-      reader = WorkbookReader(str(filePath))
-      self.all_readers.append(reader)
-
-      # get the lookzone and slide attributes from the reader
-      attrs = reader.get_attributes()
-      lookzone_attrs = attrs['lookzone'];
-      slide_attrs = attrs['slide'];
-
-      # Then if there is a config file to load, load it
-      if len(self.configFilePath):
-        saved_attrs = Configuration.read_config_file(self.configFilePath)
-        saved_slide.update(saved_attrs['slide'])
-        saved_lookzone.update(saved_attrs['lookzone'])
-
-    self.selectAttributesWidget = SelectAttributesWidget(self, list(lookzone_attrs), list(slide_attrs), saved_slide, saved_lookzone)
-    self.setCentralWidget(self.selectAttributesWidget)
-
   # Function to show the screen for selecting a configuration file
   def showLoadConfigView(self, experimentFilePaths=None):
     if experimentFilePaths:
@@ -117,7 +87,11 @@ class Window(QtGui.QMainWindow):
     firstClass = LoadFileWidget(self)
     self.setCentralWidget(firstClass)
 
-  ## Function to show the save file screen
+  # Function to show load inputs progress bar
+  def showLoadProgressView(self, experimentFilePaths):
+    self.setCentralWidget(LoadProgress(self, experimentFilePaths))
+
+  # Function to show the save file screen
   def showSaveFilesView(self, slide_attrs, lookzone_attrs):
     saveFilesView = SaveFileWidget(self, slide_attrs, lookzone_attrs)
     self.setCentralWidget(saveFilesView)
@@ -126,24 +100,24 @@ class Window(QtGui.QMainWindow):
     doneView = SessionDoneWidget(self, slideFilePath, lookzoneFilePath, configFilePath)
     self.setCentralWidget(doneView)
 
-  ## Function to save slide metric attributes
+  # Function to save slide metric attributes
   def saveSlideMetricsData(self, filePath, attrs):
     if len(attrs) > 0:
       slide_writer = SlideMetricWriter(self.all_readers, filePath, attrs)
       slide_writer.write_readers()
 
-  ## Function to save lookzone attributes
+  # Function to save lookzone attributes
   def saveLookzoneData(self, filePath, attrs):
     if len(attrs) > 0:
       lookzone_writer = LookzoneWriter(self.all_readers, filePath, attrs)
       lookzone_writer.write_readers()
 
-	## Function to save the configuration file
+	# Function to save the configuration file
   def saveConfigFile(self, filePath, slide_attrs, lookzone_attrs):
     config = Configuration(filePath, lookzone_attrs, slide_attrs)
     config.print_config_file()
 
-  ## Function to clear the state of the attributes screen after saving
+  # Function to clear the state of the attributes screen after saving
   def clearAttributesState(self):
     if self.guiState.has_key(SlideMetricsAttrListsComponent.guiStateKey):
       del self.guiState[SlideMetricsAttrListsComponent.guiStateKey]

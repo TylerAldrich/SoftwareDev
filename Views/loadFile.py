@@ -128,13 +128,12 @@ class LoadFileWidget(QtGui.QWidget):
 
   # go to next view to select data attributes
   def switchViews(self):
-    # TODO: Make application open file path at this point and validate input so we can show error on this screen
     if len(self.file_names):
       # self.window.showLoadConfigView(self.file_names)
       configFilePath = self.configFileTextEdit.text()
       if len(configFilePath):
         self.window.configFilePath = configFilePath
-      self.window.showSelectAttributesView(self.file_names)
+      self.window.showLoadProgressView(self.file_names)
     else:
       self.errorMsgLabel.setText('No input file was selected. Please choose at least one input file to continue.')
 
