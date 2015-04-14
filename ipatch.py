@@ -171,6 +171,9 @@ class Window(QtGui.QMainWindow):
     if self.guiState.has_key(LookzoneAttrListsComponent.guiStateKey):
       del self.guiState[LookzoneAttrListsComponent.guiStateKey]
 
+    if self.guiState.has_key(LoadFileWidget.guiStateKey):
+      del self.guiState[LoadFileWidget.guiStateKey]
+
 # Main function to run everything
 def main():
   app = QtGui.QApplication(sys.argv)

@@ -12,6 +12,7 @@ from error_msg_label import ErrorMsgLabel
 
 # Widget that has user browse for an input file
 class LoadFileWidget(QtGui.QWidget):
+  guiStateKey = 'loadFile'
   procNext = QtCore.pyqtSignal()
 
   def __init__(self, window):
@@ -19,6 +20,8 @@ class LoadFileWidget(QtGui.QWidget):
     self.window = window
     self.file_names = []
     self.initUI()
+    self.load_state()
+    self.updateListOfFiles()
 
   def initUI(self):
     # Create initial vertical layout
@@ -132,9 +135,10 @@ class LoadFileWidget(QtGui.QWidget):
     if len(self.file_names):
       # self.window.showLoadConfigView(self.file_names)
       configFilePath = self.configFileTextEdit.text()
-      print self.showLoadConfigCheckbox.isChecked()
       if len(configFilePath) and self.showLoadConfigCheckbox.isChecked():
         self.window.configFilePath = configFilePath
+
+      self.save_state()
       self.window.showSelectAttributesView(self.file_names)
     else:
       self.error_msg_label.setText('No input file was selected. Please choose at least one input file to continue.')
@@ -215,3 +219,21 @@ class LoadFileWidget(QtGui.QWidget):
   # Method to show an error occured while opening and parsing the file
   def show_error_on_file(self, e):
     self.error_msg_label.setText(e)
+
+  # Method to save the current state of the screen
+  def save_state(self):
+    self.window.guiState[self.__class__.guiStateKey]['chosenFiles'] = self.file_names
+    self.window.guiState[self.__class__.guiStateKey]['configFile'] = self.configFileTextEdit.text()
+
+  # Method to load the current state of the view if there is one
+  def load_state(self):
+    if not self.window.guiState.has_key(self.__class__.guiStateKey):
+      self.window.guiState[self.__class__.guiStateKey] = { 'chosenFiles': self.file_names, 'configFile': self.configFileTextEdit.text() }
+
+    self.file_names = self.window.guiState[self.__class__.guiStateKey]['chosenFiles']
+    self.configFileTextEdit.setText(self.window.guiState[self.__class__.guiStateKey]['configFile'])
+
+  # Method to clear out the state
+  def clear_state(self):
+    if self.window.guiState.has_key(self.__class__.guiStateKey):
+      del self.window.guiState[self.__class__.guiStateKey]
