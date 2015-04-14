@@ -80,7 +80,7 @@ class WorkbookReader():
         while sheet.cell_value(row,0) != LOOKZONE_STRING: # Loop until first lookzone
             row = row + 1
             if row >= sheet.nrows: # looped through entire sheet
-                raise IPatchException("Incorrectly Formated Worksheet") # don't loop forever
+                raise IPatchException("Incorrectly Formatted Worksheet") # don't loop forever
         row = row + 1
 
         while row < sheet.nrows:
@@ -101,7 +101,7 @@ class WorkbookReader():
         while sheet.cell_value(row,0) != SLIDE_STRING: # Loop until first slide metric
             row = row + 1
             if row >= sheet.nrows: # means we looped through entire sheet
-                raise IPatchException("Incorrectly Formated Worksheet") # don't loop forever
+                raise IPatchException("Incorrectly Formatted Worksheet") # don't loop forever
         row = row + 1
 
         while sheet.cell_value(row,0) != LOOKZONE_STRING:
