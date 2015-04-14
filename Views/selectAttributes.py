@@ -11,10 +11,10 @@ from navigation import NavigationWidget
 class SelectAttributesWidget(QtGui.QWidget):
   procNext = QtCore.pyqtSignal()
 
-  def __init__(self, window, lookzone_attrs, slide_attrs, saved_slide, saved_lookzone):
+  def __init__(self, window, slide_attrs, lookzone_attrs, saved_slide, saved_lookzone):
     QtGui.QWidget.__init__(self)
-    self.lookzone_attrs = lookzone_attrs
     self.slide_attrs = slide_attrs
+    self.lookzone_attrs = lookzone_attrs
     self.saved_slide = saved_slide
     self.saved_lookzone = saved_lookzone
     self.window = window
