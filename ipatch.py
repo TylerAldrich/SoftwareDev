@@ -107,7 +107,7 @@ class Window(QtGui.QMainWindow):
       self.selectAttributesWidget = SelectAttributesWidget(self, list(lookzone_attrs), list(slide_attrs), saved_slide, saved_lookzone)
       self.setCentralWidget(self.selectAttributesWidget)
     except IPatchException as e:
-      self.firstClass.show_error_on_file(str(e))
+      self.load_file_view.show_error_on_file(str(e))
 
   # Function to show the screen for selecting a configuration file
   def showLoadConfigView(self, experimentFilePaths=None):
@@ -118,8 +118,8 @@ class Window(QtGui.QMainWindow):
 
   # Function to show the screen for loading a new excel file
   def showLoadFileView(self):
-    self.firstClass = LoadFileWidget(self)
-    self.setCentralWidget(self.firstClass)
+    self.load_file_view = LoadFileWidget(self)
+    self.setCentralWidget(self.load_file_view)
 
   ## Function to show the save file screen
   def showSaveFilesView(self, slide_attrs, lookzone_attrs):
