@@ -1,3 +1,5 @@
+from ipatch_exception import IPatchException
+
 class Configuration():
 
     def __init__(self, filename, lookzone_attrs, slide_attrs):
@@ -9,19 +11,31 @@ class Configuration():
     def read_config_file(filename):
         """This is a class method that reads in an existing Configuration File
         and returns a dictionary containing all attributes"""
-        f = open(filename, 'r')
-        lookzones = []    
-        slides = []
-        config_dict = {"lookzone" : lookzones, "slide" : slides}
-        val = "lookzone"
-        for line in f:
-            if line == "LOOKZONE:\n":
-                val = "lookzone"
-            elif line == "SLIDE:\n":
-                val = "slide"
-            else: 
-                config_dict[val].append(line.rstrip('\r\n'))
-        f.close()
+        try:
+            f = open(filename, 'r')
+            seen_lookzone = False
+            seen_slide = False
+            lookzones = []
+            slides = []
+            config_dict = {"lookzone" : lookzones, "slide" : slides}
+            val = "lookzone"
+            for line in f:
+                if line == "LOOKZONE:\n":
+                    seen_lookzone = True
+                    val = "lookzone"
+                elif line == "SLIDE:\n":
+                    seen_slide = True
+                    val = "slide"
+                else:
+                    config_dict[val].append(line.rstrip('\r\n'))
+            f.close()
+        except:
+            raise IPatchException('Invalid configuration file')
+
+        # Check the file is a valid config file
+        if not seen_lookzone or not seen_slide:
+            raise IPatchException('Invalid configuration file')
+
         return config_dict
 
 
@@ -31,7 +45,6 @@ class Configuration():
         self.print_attributes(self._lookzone_attrs,"LOOKZONE:",f)
         self.print_attributes(self._slide_attrs,"SLIDE:",f)
         f.close()
-        
 
 
     def print_attributes(self,attrs,heading,file_descriptor):

@@ -52,6 +52,8 @@ class LoadProgress(QtGui.QWidget):
 
   # Updates UI when task is complete
   def onFinished(self, i):
+    # save workbook reader objects to window to use for writing output later
+    self.window.all_readers = self.loadingFilesTask.get_all_readers()
     self.showSelectAttributesView()
 
   # Function to show the screen for selecting attributes
@@ -66,12 +68,16 @@ class ReadInputFilesThread(QtCore.QThread):
 
   def __init__(self, experimentFilePaths, configFilePath=None):
     super(ReadInputFilesThread, self).__init__()
+    self.all_readers = []
     self.saved_slide = set()
     self.saved_lookzone = set()
     self.slide_attrs = []
     self.lookzone_attrs = []
     self.experimentFilePaths = experimentFilePaths
     self.configFilePath = configFilePath or ''
+
+  def get_all_readers(self):
+    return self.all_readers
 
   def get_saved_slide_attrs(self):
     return list(self.saved_slide)
@@ -87,7 +93,6 @@ class ReadInputFilesThread(QtCore.QThread):
 
   # open and read input Excel files to get attributes
   def load_input_files(self):
-    self.all_readers = []
     # keep track of how much progress we've made opening/reading files
     opened_files = 0
     num_files = len(self.experimentFilePaths)
