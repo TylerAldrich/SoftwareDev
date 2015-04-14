@@ -73,9 +73,6 @@ class LoadFileWidget(QtGui.QWidget):
     add_remove_layout.addWidget(self.add_file_button)
     layout.addLayout(add_remove_layout)
 
-    self.errorMsgLabel = ErrorMsgLabel('')
-    layout.addWidget(self.errorMsgLabel)
-
     self.showLoadConfigCheckbox = QtGui.QCheckBox('Load attributes from iPatch configuration file')
     self.showLoadConfigCheckbox.stateChanged.connect(self.showLoadConfig)
 
@@ -84,11 +81,13 @@ class LoadFileWidget(QtGui.QWidget):
     self.loadConfig = self.makeLoadConfig()
     layout.addWidget(self.loadConfig)
 
-    layout.addWidget(self.loadConfig)
+    self.error_msg_label = ErrorMsgLabel('')
+    layout.addWidget(self.error_msg_label)
+
     # Add navigation to layout
     navigation = NavigationWidget(self.window, None, self.switchViews)
     layout.addWidget(navigation)
-  
+
   def selectConfigFile(self):
     self.configFileTextEdit.setText(QtGui.QFileDialog.getOpenFileName())
 
@@ -129,14 +128,16 @@ class LoadFileWidget(QtGui.QWidget):
   # go to next view to select data attributes
   def switchViews(self):
     # TODO: Make application open file path at this point and validate input so we can show error on this screen
+    self.window.configFilePath = '' # reset config file path just in case it was unchecked
     if len(self.file_names):
       # self.window.showLoadConfigView(self.file_names)
       configFilePath = self.configFileTextEdit.text()
-      if len(configFilePath):
+      print self.showLoadConfigCheckbox.isChecked()
+      if len(configFilePath) and self.showLoadConfigCheckbox.isChecked():
         self.window.configFilePath = configFilePath
       self.window.showSelectAttributesView(self.file_names)
     else:
-      self.errorMsgLabel.setText('No input file was selected. Please choose at least one input file to continue.')
+      self.error_msg_label.setText('No input file was selected. Please choose at least one input file to continue.')
 
   # open a file dialog to pick an xlsx input file
   def selectFile(self):
@@ -200,7 +201,7 @@ class LoadFileWidget(QtGui.QWidget):
     for added_file in added_files:
       if added_file in self.file_names:
         # throw error
-        self.errorMsgLabel.setText('File has already been added, cannot add same file twice.')
+        self.error_msg_label.setText('File has already been added, cannot add same file twice.')
       else:
         self.file_names.append(added_file)
 
@@ -209,4 +210,8 @@ class LoadFileWidget(QtGui.QWidget):
 
   # Method to just clear out the error message after another click occurs
   def clearErrorMessage(self):
-    self.errorMsgLabel.setText('')
+    self.error_msg_label.setText('')
+
+  # Method to show an error occured while opening and parsing the file
+  def show_error_on_file(self, e):
+    self.error_msg_label.setText(e)

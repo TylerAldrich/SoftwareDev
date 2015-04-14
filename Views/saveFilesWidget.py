@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import re
 from sys import argv
 from PyQt4 import QtGui, QtCore
 from navigation import NavigationWidget
@@ -51,8 +52,8 @@ class SaveFileWidget(QtGui.QWidget):
       # Add horizontal layout to overall layout
       layout.addLayout(browseLookzoneFileLayout)
 
-      self.lookzoneErrorMsgLabel = QtGui.QLabel('')
-      layout.addWidget(self.lookzoneErrorMsgLabel)
+      self.lookzone_error_msg_label = QtGui.QLabel('')
+      layout.addWidget(self.lookzone_error_msg_label)
 
     ## Save config file section
     configTitleLabel = QtGui.QLabel('Make Configurations File <b>(Optional)</b>', self)
@@ -102,17 +103,17 @@ class SaveFileWidget(QtGui.QWidget):
 
     layout.addLayout(browseFileLayout)
 
-    self.slideErrorMsgLabel = QtGui.QLabel('')
-    layout.addWidget(self.slideErrorMsgLabel)
-    
+    self.slide_error_msg_label = QtGui.QLabel('')
+    layout.addWidget(self.slide_error_msg_label)
+
     return layout;
 
   def writeOutputs(self):
-    if len(self.slide_attrs) > 0:
+    if len(self.slide_attrs):
       # Save slide metrics data
       self.window.saveSlideMetricsData(self.slideFileName, self.slide_attrs)
 
-    if len(self.lookzone_attrs) > 0:
+    if len(self.lookzone_attrs):
       # Save Lookzone metrics data
       self.window.saveLookzoneData(self.lookzoneFileName, self.lookzone_attrs)
 
@@ -124,22 +125,23 @@ class SaveFileWidget(QtGui.QWidget):
   # go back to attribute selection view
   def goBack(self):
     self.window.showSelectAttributesView()
-  
+
   def validateInputs(self):
     foundError = False
 
-    if len(self.slide_attrs) > 0:
+    regex_format = re.compile(".*\.xls$")
+    if len(self.slide_attrs):
       self.slideFileName = self.fileTextEdit.text()
 
-      if not len(self.slideFileName):
-        self.slideErrorMsgLabel.setText('<b style="color:red">You must select an output location for Slide Metrics.</b>')
+      if not len(self.slideFileName) or not regex_format.match(self.slideFileName):
+        self.slide_error_msg_label.setText('<b style="color:red">You must select a valid output location for Slide Metrics.</b>')
         foundError = True
 
-    if len(self.lookzone_attrs) > 0:
+    if len(self.lookzone_attrs):
       self.lookzoneFileName = self.lookzoneFileEdit.text()
 
-      if not len(self.lookzoneFileName):
-        self.lookzoneErrorMsgLabel.setText('<b style="color:red">You must select an output location for LookZone Data.</b>')
+      if not len(self.lookzoneFileName) or not regex_format.match(self.lookzoneFileName):
+        self.lookzone_error_msg_label.setText('<b style="color:red">You must select a valid output location for LookZone Data.</b>')
         foundError = True
 
     return not foundError
@@ -184,4 +186,11 @@ class SaveFileWidget(QtGui.QWidget):
     save_dialog.setNameFilter(self.tr("Excel (*.xls)"))
     save_dialog.setDefaultSuffix("xls")
     return save_dialog
+
+  # Function to show the user an error occured while saving the type of file
+  def set_error(self, attr_type, e):
+    if attr_type == 'slide':
+      self.slide_error_msg_label.setText(e)
+    else:
+      self.lookzone_error_msg_label.setText(e)
 
