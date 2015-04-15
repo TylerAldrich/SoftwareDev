@@ -13,7 +13,7 @@ from Views.loadConfig import LoadConfigWidget
 from Views.slideMetricsAttrLists import SlideMetricsAttrListsComponent
 from Views.lookzoneAttrLists import LookzoneAttrListsComponent
 from Views.load_progress import LoadProgress
-from Views.load_progress import ReadInputFilesThread
+from Views.write_progress import WriteProgress
 from workbook_reader import WorkbookReader
 from workbook_writer import SlideMetricWriter, LookzoneWriter
 from configuration import Configuration
@@ -31,6 +31,9 @@ class Window(QtGui.QMainWindow):
     self.appHeight = 500
     # save a Dict that caches the state of certain GUI elements
     self.guiState = {}
+    self.attribute_cache = {}
+    # save the reader objects from reading input files
+    self.all_readers = []
     # the config file should persist through views so save it in window
     self.configFilePath = ''
     self.set_style()
@@ -87,7 +90,7 @@ class Window(QtGui.QMainWindow):
       QtGui.QMessageBox.No, QtGui.QMessageBox.No)
 
     if reply == QtGui.QMessageBox.Yes:
-      self.clearAttributesState()
+      self.clearGuiState()
       self.showLoadFileView()
 
   # Function to show the screen for selecting a configuration file
@@ -105,6 +108,15 @@ class Window(QtGui.QMainWindow):
   # Function to show load inputs progress bar
   def showLoadProgressView(self, experimentFilePaths):
     self.setCentralWidget(LoadProgress(self, experimentFilePaths))
+
+  # Function to show the screen for selecting attributes (only on going back from save view)
+  def showSelectAttributesView(self):
+    selectAttributesWidget = SelectAttributesWidget(self, self.attribute_cache['slide_attrs'], self.attribute_cache['lookzone_attrs'], self.attribute_cache['saved_slide_attrs'], self.attribute_cache['saved_lookzone_attrs'])
+    self.setCentralWidget(selectAttributesWidget)
+
+  # Function to show write outputs progress bar
+  def showWriteProgressView(self, output_file_paths, slide_attrs, lookzone_attrs):
+    self.setCentralWidget(WriteProgress(self, output_file_paths, slide_attrs, lookzone_attrs))
 
   # Function to show the save file screen
   def showSaveFilesView(self, slide_attrs, lookzone_attrs):
@@ -138,16 +150,24 @@ class Window(QtGui.QMainWindow):
     config = Configuration(filePath, lookzone_attrs, slide_attrs)
     config.print_config_file()
 
+  # Function to clear all saved state in GUI including selected config file and attributes
+  def clearGuiState(self):
+    self.clearAttributesState()
+    self.configFilePath = ''
+    self.all_readers = []
+    self.attribute_cache = {}
+
   # Function to clear the state of the attributes screen after saving
   def clearAttributesState(self):
-    if self.guiState.has_key(SlideMetricsAttrListsComponent.guiStateKey):
-      del self.guiState[SlideMetricsAttrListsComponent.guiStateKey]
+    self.guiState = {}
+    # if self.guiState.has_key(SlideMetricsAttrListsComponent.guiStateKey):
+    #   del self.guiState[SlideMetricsAttrListsComponent.guiStateKey]
 
-    if self.guiState.has_key(LookzoneAttrListsComponent.guiStateKey):
-      del self.guiState[LookzoneAttrListsComponent.guiStateKey]
+    # if self.guiState.has_key(LookzoneAttrListsComponent.guiStateKey):
+    #   del self.guiState[LookzoneAttrListsComponent.guiStateKey]
 
-    if self.guiState.has_key(LoadFileWidget.guiStateKey):
-      del self.guiState[LoadFileWidget.guiStateKey]
+    # if self.guiState.has_key(LoadFileWidget.guiStateKey):
+    #   del self.guiState[LoadFileWidget.guiStateKey]
 
 # Main function to run everything
 def main():

@@ -58,7 +58,11 @@ class LoadProgress(QtGui.QWidget):
 
   # Function to show the screen for selecting attributes
   def showSelectAttributesView(self):
-    selectAttributesWidget = SelectAttributesWidget(self.window, self.loadingFilesTask.get_slide_attrs(), self.loadingFilesTask.get_lookzone_attrs(), self.loadingFilesTask.get_saved_slide_attrs(), self.loadingFilesTask.get_saved_lookzone_attrs())
+    self.window.attribute_cache['slide_attrs'] = self.loadingFilesTask.get_slide_attrs()
+    self.window.attribute_cache['lookzone_attrs'] = self.loadingFilesTask.get_lookzone_attrs()
+    self.window.attribute_cache['saved_slide_attrs'] = self.loadingFilesTask.get_saved_slide_attrs()
+    self.window.attribute_cache['saved_lookzone_attrs'] = self.loadingFilesTask.get_saved_lookzone_attrs()
+    selectAttributesWidget = SelectAttributesWidget(self.window, self.window.attribute_cache['slide_attrs'] , self.window.attribute_cache['saved_lookzone_attrs'], self.window.attribute_cache['saved_slide_attrs'], self.window.attribute_cache['saved_lookzone_attrs'])
     self.window.setCentralWidget(selectAttributesWidget)
 
 # Class to run opening and reading of input files in a separate thread
