@@ -111,6 +111,7 @@ class Window(QtGui.QMainWindow):
 
   # Function to show the screen for selecting attributes (only on going back from save view)
   def showSelectAttributesView(self):
+    print("CALLING showSelectAttributesView FROM WINDOW!")
     selectAttributesWidget = SelectAttributesWidget(self, self.attribute_cache['slide_attrs'], self.attribute_cache['lookzone_attrs'], self.attribute_cache['saved_slide_attrs'], self.attribute_cache['saved_lookzone_attrs'])
     self.setCentralWidget(selectAttributesWidget)
 

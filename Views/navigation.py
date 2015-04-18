@@ -9,7 +9,6 @@ from PyQt4 import QtGui, QtCore
 # expects the main window and two callback functions for "back"
 # and "next" clicks. If either is not provided, its respective button
 # is also not included in the widget.
-# TODO: Refactor this code to allow customization like placement, custom text, etc.
 class NavigationWidget(QtGui.QWidget):
 	procNext = QtCore.pyqtSignal()
 
