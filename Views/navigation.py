@@ -23,10 +23,12 @@ class NavigationWidget(QtGui.QWidget):
 		navigationLayout = QtGui.QHBoxLayout(self)
 		if not self.prevClicked is None:
 			self.back = QtGui.QPushButton('Back')
+			self.back.setCursor(QtCore.Qt.PointingHandCursor)
 			navigationLayout.addWidget(self.back)
 			self.back.clicked.connect(self.prevClicked)
 		if not self.nextClicked is None:
 			navigationLayout.addStretch(1)
 			self.next = QtGui.QPushButton('Next')
+			self.next.setCursor(QtCore.Qt.PointingHandCursor)
 			navigationLayout.addWidget(self.next)
 			self.next.clicked.connect(self.nextClicked)
