@@ -94,7 +94,7 @@ class LookzoneWriter(WorkbookWriter):
             col_names = set()
             for reader in readers:
                 current_lookzone_num = 1
-                for stat in reader._stat_sheets:
+                for stat in reader.get_sheet_names():
                     for lookzone in reader.get_lookzones(stat):
                         col_name = self.__get_header(stat, lookzone, current_lookzone_num)
                         current_lookzone_num += 1
@@ -117,7 +117,7 @@ class LookzoneWriter(WorkbookWriter):
 
     def __get_header(self, stat, lookzone, lz_num):
         """ Returns header for a given stat sheet and lookzone object """
-        sheet_name = stat.name.split('.')[0]
+        sheet_name = stat.split('.')[0]
 
         if "OUTSIDE" in lookzone.name: # last lookzone of the file
             col_name = "%s_outside" % sheet_name
@@ -137,7 +137,7 @@ class LookzoneWriter(WorkbookWriter):
             # Add data for the subject
             write_sheet.write(row_num, 0, subject_id)
             current_lookzone_num = 1
-            for stat in reader._stat_sheets:
+            for stat in reader.get_sheet_names():
                 for lookzone in reader.get_lookzones(stat):
                     if lookzone.has_attribute(attribute): # only add if attr exists
                         col_name = self.__get_header(stat, lookzone, current_lookzone_num)
@@ -166,7 +166,7 @@ class SlideMetricWriter(WorkbookWriter):
 
     def __get_header(self, stat):
         """ Returns header for a given stat sheet and lookzone object """
-        sheet_name = stat.name.split('.')[0]
+        sheet_name = stat.split('.')[0]
         return sheet_name
 
     def write_headers(self, readers):
@@ -186,7 +186,7 @@ class SlideMetricWriter(WorkbookWriter):
             write_sheet.write(0, 0, 'SubjectID')
             col_names = set()
             for reader in readers:
-                for stat in reader._stat_sheets:
+                for stat in reader.get_sheet_names():
                     col_name = self.__get_header(stat)
                     col_names.add(col_name)
 
@@ -211,7 +211,7 @@ class SlideMetricWriter(WorkbookWriter):
             # Add data for the subject
             write_sheet.write(row_num, 0, subject_id)
             col_num = 1
-            for stat in reader._stat_sheets:
+            for stat in reader.get_sheet_names():
                 slidemetric = reader.get_slidemetrics(stat)
                 if slidemetric.has_attribute(attribute): # only add if attr exists
                     col_name = self.__get_header(stat)

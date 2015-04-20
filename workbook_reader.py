@@ -19,17 +19,30 @@ class WorkbookReader():
         except:
             raise IPatchException("File could not be opened")
         self._stat_sheets = []
-        self._data_dict = {}
         self.workbook_filename = workbook_file
         self.get_sheets()
+
+        self.lookzone_dict = {}
+        self.slide_dict = {}
+        for sheet in self.get_sheets():
+            self.lookzone_dict[sheet.name] = self._get_lookzones(sheet)
+            self.slide_dict[sheet.name] = self._get_slidemetrics(sheet)
+
+        self.attrs = self._get_attributes()
+        del self.workbook
+        del self._stat_sheets
 
     def get_sheets(self):
         """ Return needed sheets from the workbook (end in STAT) """
         if not self._stat_sheets:
             stat_sheet_names = filter(lambda w: w.endswith('STAT'), self.workbook.sheet_names())
             self._stat_sheets = [self.workbook.sheet_by_name(sheet) for sheet in stat_sheet_names]
+            self.sheet_names = [sheet.name for sheet in self._stat_sheets]
 
         return self._stat_sheets
+
+    def get_sheet_names(self):
+        return self.sheet_names
 
     def get_subject_id(self):
         """ Return subject id (first numbers in file name)"""
@@ -38,6 +51,9 @@ class WorkbookReader():
         return filename.split('-')[0].strip()
 
     def get_attributes(self):
+        return self.attrs
+
+    def _get_attributes(self):
         """returns a hash of a set of attributes for lookzone attributes and slide attributes
         OUTPUT: {'lookzone' : (Setof String), 'slide' : (Setof String)} """
         lookzone_attrs = set()
@@ -66,14 +82,15 @@ class WorkbookReader():
 
 
     def _valid_lookzone_value(self, v):
-        return not re.match("ATT_.*|LookZone.*|LOOKZONE.*|Vertex.*", v)
+        return not re.match("ATT_.*|LookZone.*|LOOKZONE.*|Vertex.*|.*[Ll]ower right [xy].*|.*[Ll]ower left [xy].*|" +
+                            ".*[Uu]pper right [xy].*|.*[Uu]pper left [xy].*", v)
 
     def _valid_slidemetric_value(self, v):
         return v != SLIDE_STRING
 
     ##### Sheet Methods ####
 
-    def get_lookzones(self,sheet):
+    def _get_lookzones(self,sheet):
         """ Return an Array of Lookzones for the given sheet """
         row = 0
         lookzones = []
@@ -93,8 +110,13 @@ class WorkbookReader():
             row = row + 1
         return lookzones
 
+    def get_lookzones(self, sheet_name):
+        return self.lookzone_dict[sheet_name]
 
-    def get_slidemetrics(self, sheet):
+    def get_slidemetrics(self, sheet_name):
+        return self.slide_dict[sheet_name]
+
+    def _get_slidemetrics(self, sheet):
         """Return the slide metric object for the given sheet"""
         row = 0
         slidemetric = Slidemetrics("blah")
