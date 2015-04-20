@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import os
 from sys import argv
 from PyQt4 import QtGui, QtCore
 from Views.selectAttributes import SelectAttributesWidget
@@ -11,9 +12,12 @@ from Views.sessionDoneWidget import SessionDoneWidget
 from Views.loadConfig import LoadConfigWidget
 from Views.slideMetricsAttrLists import SlideMetricsAttrListsComponent
 from Views.lookzoneAttrLists import LookzoneAttrListsComponent
+from Views.load_progress import LoadProgress
+from Views.write_progress import WriteProgress
 from workbook_reader import WorkbookReader
 from workbook_writer import SlideMetricWriter, LookzoneWriter
 from configuration import Configuration
+from ipatch_exception import IPatchException
 
 # The main class that starts and enables flow through
 # the different views of the application
@@ -25,8 +29,11 @@ class Window(QtGui.QMainWindow):
     self.appVersion = 'v0.1'
     self.appWidth = 700
     self.appHeight = 500
-    # save a Dict that caches the state of certain GUI elements 
+    # save a Dict that caches the state of certain GUI elements
     self.guiState = {}
+    self.attribute_cache = {}
+    # save the reader objects from reading input files
+    self.all_readers = []
     # the config file should persist through views so save it in window
     self.configFilePath = ''
     self.set_style()
@@ -40,15 +47,21 @@ class Window(QtGui.QMainWindow):
     # Load up the Load file view
     self.showLoadFileView()
 
+    # Add a menu bar where the user can start over or quit
+    menu = self.menuBar().addMenu('File')
+    menu.addAction('New Experiment', self.start_new)
+    menu.addAction('Quit', self.closeApp)
+
   def set_style(self):
-    f = open('ipatch_style.stylesheet', 'r')
+    try:
+        current_path = sys._MEIPASS
+    except Exception:
+        current_path = os.path.dirname(os.path.realpath(__file__))
+    stylesheet = os.path.join(current_path, 'ipatch_style.stylesheet')
+    f = open(stylesheet, 'r')
     self.style_data = f.read()
     f.close()
     self.setStyleSheet(self.style_data)
-
-  # def setCentralWidget(self, widget):
-  #   widget.setStyleSheet(self.style_data)
-  #   super(Window, self).setCentralWidget(widget)
 
   # Function to center the window on screen
   def center(self):
@@ -71,33 +84,14 @@ class Window(QtGui.QMainWindow):
   def closeApp(self):
     self.close()
 
-  # Function to show the screen for selecting attributes 
-  def showSelectAttributesView(self, experimentFilePaths=None):
-    if experimentFilePaths:
-      self.experimentFilePaths = experimentFilePaths
-    # For each file in the list of files, create a reader and get all of its attributes
-    saved_slide = set()
-    saved_lookzone = set()
-    self.all_readers = []
-    for filePath in self.experimentFilePaths:
-      print str(filePath)
-      # First parse the experiment from the saved file path
-      reader = WorkbookReader(str(filePath))
-      self.all_readers.append(reader)
+  def start_new(self):
+    reply = QtGui.QMessageBox.question(self, 'Message',
+      "Are you sure you want to start a new session?", QtGui.QMessageBox.Yes |
+      QtGui.QMessageBox.No, QtGui.QMessageBox.No)
 
-      # get the lookzone and slide attributes from the reader
-      attrs = reader.get_attributes()
-      lookzone_attrs = attrs['lookzone'];
-      slide_attrs = attrs['slide'];
-
-      # Then if there is a config file to load, load it
-      if len(self.configFilePath):
-        saved_attrs = Configuration.read_config_file(self.configFilePath)
-        saved_slide.update(saved_attrs['slide'])
-        saved_lookzone.update(saved_attrs['lookzone'])
-
-    self.selectAttributesWidget = SelectAttributesWidget(self, list(lookzone_attrs), list(slide_attrs), saved_slide, saved_lookzone)
-    self.setCentralWidget(self.selectAttributesWidget)
+    if reply == QtGui.QMessageBox.Yes:
+      self.clearGuiState()
+      self.showLoadFileView()
 
   # Function to show the screen for selecting a configuration file
   def showLoadConfigView(self, experimentFilePaths=None):
@@ -108,42 +102,72 @@ class Window(QtGui.QMainWindow):
 
   # Function to show the screen for loading a new excel file
   def showLoadFileView(self):
-    firstClass = LoadFileWidget(self)
-    self.setCentralWidget(firstClass)
+    self.load_file_view = LoadFileWidget(self)
+    self.setCentralWidget(self.load_file_view)
 
-  ## Function to show the save file screen
+  # Function to show load inputs progress bar
+  def showLoadProgressView(self, experimentFilePaths):
+    self.setCentralWidget(LoadProgress(self, experimentFilePaths))
+
+  # Function to show the screen for selecting attributes (only on going back from save view)
+  def showSelectAttributesView(self):
+    selectAttributesWidget = SelectAttributesWidget(self, self.attribute_cache['slide_attrs'], self.attribute_cache['lookzone_attrs'], self.attribute_cache['saved_slide_attrs'], self.attribute_cache['saved_lookzone_attrs'])
+    self.setCentralWidget(selectAttributesWidget)
+
+  # Function to show write outputs progress bar
+  def showWriteProgressView(self, output_file_paths, slide_attrs, lookzone_attrs):
+    self.setCentralWidget(WriteProgress(self, output_file_paths, slide_attrs, lookzone_attrs))
+
+  # Function to show the save file screen
   def showSaveFilesView(self, slide_attrs, lookzone_attrs):
-    saveFilesView = SaveFileWidget(self, slide_attrs, lookzone_attrs)
-    self.setCentralWidget(saveFilesView)
+    self.save_files_view = SaveFileWidget(self, slide_attrs, lookzone_attrs)
+    self.setCentralWidget(self.save_files_view)
 
   def showDoneView(self, slideFilePath, lookzoneFilePath, configFilePath):
     doneView = SessionDoneWidget(self, slideFilePath, lookzoneFilePath, configFilePath)
     self.setCentralWidget(doneView)
 
-  ## Function to save slide metric attributes
+  # Function to save slide metric attributes
   def saveSlideMetricsData(self, filePath, attrs):
     if len(attrs) > 0:
-      slide_writer = SlideMetricWriter(self.all_readers, filePath, attrs)
-      slide_writer.write_readers()
+      try:
+        slide_writer = SlideMetricWriter(self.all_readers, filePath, attrs)
+        slide_writer.write_readers()
+      except IPatchException as e:
+        self.save_files_view.set_error('slide', str(e))
 
-  ## Function to save lookzone attributes
+  # Function to save lookzone attributes
   def saveLookzoneData(self, filePath, attrs):
     if len(attrs) > 0:
-      lookzone_writer = LookzoneWriter(self.all_readers, filePath, attrs)
-      lookzone_writer.write_readers()
+      try:
+        lookzone_writer = LookzoneWriter(self.all_readers, filePath, attrs)
+        lookzone_writer.write_readers()
+      except IPatchException as e:
+        self.save_files_view.set_error('lookzone', str(e))
 
-	## Function to save the configuration file
+	# Function to save the configuration file
   def saveConfigFile(self, filePath, slide_attrs, lookzone_attrs):
     config = Configuration(filePath, lookzone_attrs, slide_attrs)
     config.print_config_file()
 
-  ## Function to clear the state of the attributes screen after saving
-  def clearAttributesState(self):
-    if self.guiState.has_key(SlideMetricsAttrListsComponent.guiStateKey):
-      del self.guiState[SlideMetricsAttrListsComponent.guiStateKey]
+  # Function to clear all saved state in GUI including selected config file and attributes
+  def clearGuiState(self):
+    self.clearAttributesState()
+    self.configFilePath = ''
+    self.all_readers = []
+    self.attribute_cache = {}
 
-    if self.guiState.has_key(LookzoneAttrListsComponent.guiStateKey):
-      del self.guiState[LookzoneAttrListsComponent.guiStateKey]
+  # Function to clear the state of the attributes screen after saving
+  def clearAttributesState(self):
+    self.guiState = {}
+    # if self.guiState.has_key(SlideMetricsAttrListsComponent.guiStateKey):
+    #   del self.guiState[SlideMetricsAttrListsComponent.guiStateKey]
+
+    # if self.guiState.has_key(LookzoneAttrListsComponent.guiStateKey):
+    #   del self.guiState[LookzoneAttrListsComponent.guiStateKey]
+
+    # if self.guiState.has_key(LoadFileWidget.guiStateKey):
+    #   del self.guiState[LoadFileWidget.guiStateKey]
 
 # Main function to run everything
 def main():

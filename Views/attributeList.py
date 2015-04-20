@@ -49,7 +49,7 @@ class AttributeListsComponent(QtGui.QWidget):
     num_selected_attrs = len(self.selectedAttributes)
     for i in xrange(num_selected_attrs):
       attrs_are_chosen[self.selectedAttributes[i]] = True
-
+    
     return attrs_are_chosen
 
   # construct and return a widget containing a filter box
@@ -77,7 +77,7 @@ class AttributeListsComponent(QtGui.QWidget):
     attributesLayout.addWidget(self.attributeSearchBar)
     # build list widget and add to layout
     self.chooseListWidget = self.createListWidget(self.attributes, self.buttonTextAdd)
-    self.showOnlyAttrs(self.chooseListWidget, self.chooseListAttributes)
+    self.filterAttributes()
     attributesLayout.addWidget(self.chooseListWidget)
     return attributesLayout
 
@@ -98,7 +98,7 @@ class AttributeListsComponent(QtGui.QWidget):
     selectedLayout.addWidget(self.chosen_search_bar)
     # build selected attributes list and add to layout
     self.selectedListWidget = self.createListWidget(self.attributes, self.buttonTextRemove)
-    self.showOnlyAttrs(self.selectedListWidget, self.selectedAttributes)
+    self.filterChosen()
     selectedLayout.addWidget(self.selectedListWidget)
     selectedLayout.addWidget(self.clear_all_button)
     return selectedLayout
@@ -135,8 +135,7 @@ class AttributeListsComponent(QtGui.QWidget):
     selectedList = []
     for i in selectedItems:
       self.attributes_are_chosen[str(i.text())] = True
-      self.chooseListWidget.setItemHidden(i, True)
-      self.selectedListWidget.setItemHidden(self.getMatchingItemFromList(i, self.selectedListWidget), False)
+    self.filterAttributes()
     self.filterChosen()
 
   # move selected attrs in selected list to the choose list
@@ -145,14 +144,12 @@ class AttributeListsComponent(QtGui.QWidget):
     removedList = []
     for i in selectedItems:
       self.attributes_are_chosen[str(i.text())] = False
-      self.chooseListWidget.setItemHidden(self.getMatchingItemFromList(i, self.chooseListWidget), False)
-      self.selectedListWidget.setItemHidden(i, True)
     self.filterAttributes()
+    self.filterChosen()
 
   # save GUI state (lists and filterbox) to the window
   def saveState(self):
-    self.window.guiState[self.__class__.guiStateKey]['chooseAttrsItems'] = self.getVisibleListItems(self.chooseListWidget)
-    self.window.guiState[self.__class__.guiStateKey]['selectedAttrsItems'] = self.getVisibleListItems(self.selectedListWidget)
+    self.window.guiState[self.__class__.guiStateKey]['selectedAttrsItems'] = self.getChosenAttrs()
     self.window.guiState[self.__class__.guiStateKey]['filter'] = self.attributeSearchBar.text()
     self.window.guiState[self.__class__.guiStateKey]['chosen_filter'] = self.chosen_search_bar.text()
 
@@ -160,12 +157,11 @@ class AttributeListsComponent(QtGui.QWidget):
   def loadState(self):
     # if there is no saved state, create a new one for this view
     if not self.window.guiState.has_key(self.__class__.guiStateKey):
-      self.window.guiState[self.__class__.guiStateKey] = { 'chooseAttrsItems': self.__class__.attr_list, 'selectedAttrsItems': self.__class__.saved_attrs, 'filter': '' , 'chosen_filter' : ''}
+      self.window.guiState[self.__class__.guiStateKey] = { 'selectedAttrsItems': self.__class__.saved_attrs, 'filter': '' , 'chosen_filter' : ''}
 
     # keep reference to full attribute list for ourselves to use in this class
     self.attributes = self.__class__.attr_list
 
-    self.chooseListAttributes = self.window.guiState[self.__class__.guiStateKey]['chooseAttrsItems']
     self.filter = self.window.guiState[self.__class__.guiStateKey]['filter']
     self.chosen_filter = self.window.guiState[self.__class__.guiStateKey]['chosen_filter']
     self.selectedAttributes = self.window.guiState[self.__class__.guiStateKey]['selectedAttrsItems']
@@ -176,25 +172,13 @@ class AttributeListsComponent(QtGui.QWidget):
       del self.window.guiState[self.__class__.guiStateKey]
 
   # returns list of strings of chosen attributes for output from the given list widget
-  def getFinalChosenAttrs(self, listWidget):
-    # reset filter to see all
-    self.setFilter('')
-    self.filterAttributes()
-    attributes = []
-    # get all attribute names that are visible
-    for i in xrange(listWidget.count()):
-      currentItem = listWidget.item(i)
-      if not listWidget.isItemHidden(currentItem):
-        attributes.append(str(currentItem.text()))
-    return attributes
+  def getChosenAttrs(self):
+    chosen_attributes = []
+    for attr, chosen in self.attributes_are_chosen.items():
+      if chosen is True:
+        chosen_attributes.append(attr)
 
-  # returns a list of the text items from the given list widget
-  def getItemsFromListView(self, widget):
-    items = []
-    for index in xrange(widget.count()):
-      items.append(widget.item(index))
-    labels = [str(i.text()) for i in items]
-    return labels
+    return chosen_attributes
 
   # sets the filter to the given string query
   def setFilter(self, query):
@@ -221,57 +205,6 @@ class AttributeListsComponent(QtGui.QWidget):
       listItem = self.selectedListWidget.item(index)
       isHidden = listItem not in searchedItems or not self.attributes_are_chosen[str(listItem.text())]
       self.selectedListWidget.setItemHidden(listItem, isHidden)
-
-  # Finds an item in given list with the same text and returns it, returns None if no matches
-  def getMatchingItemFromList(self, item, listWidget):
-    for i in xrange(listWidget.count()):
-      currentItem = listWidget.item(i)
-      if currentItem.text() == item.text():
-        return currentItem
-    return None
-
-  def itemIsVisibleInList(self, listWidget, item):
-    for i in xrange(listWidget.count()):
-      currentItem = listWidget.item(i)
-      if currentItem.text() == item.text() and not listWidget.isItemHidden(currentItem):
-        return True
-    return False
-
-  # Returns list of strings from visible items in given list widget
-  def getVisibleListItems(self, listWidget):
-    listCount = listWidget.count()
-    visibleItems = []
-    for i in xrange(listCount):
-      currentItem = listWidget.item(i)
-      if not listWidget.isItemHidden(currentItem):
-        visibleItems.append(currentItem.text())
-    return visibleItems
-
-  # Shows only attributes given in list, hides others in list widget
-  def showOnlyAttrs(self, listWidget, toShow):
-    listCount = listWidget.count()
-    # Set all items to hidden to start
-    for i in xrange(listCount):
-      listWidget.setItemHidden(listWidget.item(i), True)
-    # Find items to show in list
-    for item in toShow:
-      for i in xrange(listCount):
-        if listWidget.item(i).text() == item:
-          listWidget.setItemHidden(listWidget.item(i), False)
-          break
-
-  # Hides only attributes given in list, shows others in list widget
-  def hideOnlyAttrs(self, listWidget, toHide):
-    listCount = listWidget.count()
-    # Set all items to shown to start
-    for i in xrange(listCount):
-      listWidget.setItemHidden(listWidget.item(i), False)
-    # Find items to show in list
-    for item in toHide:
-      for i in xrange(listCount):
-        if listWidget.item(i).text() == item:
-          listWidget.setItemHidden(listWidget.item(i), True)
-          break
 
   # Clears all of the selected attributes
   def clearAllAttrs(self):

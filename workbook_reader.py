@@ -2,6 +2,7 @@ import xlrd
 import pprint
 import pdb
 import re
+import os
 from metrics import Metrics, Lookzone, Slidemetrics
 from ipatch_exception import IPatchException
 
@@ -46,7 +47,7 @@ class WorkbookReader():
     def get_subject_id(self):
         """ Return subject id (first numbers in file name)"""
         # get xls filename (end of path x/y/z/123-foo.xls)
-        filename = self.workbook_filename.split('/')[-1]
+        filename = self.workbook_filename.split(os.sep)[-1]
         return filename.split('-')[0].strip()
 
     def get_attributes(self):
@@ -96,7 +97,7 @@ class WorkbookReader():
         while sheet.cell_value(row,0) != LOOKZONE_STRING: # Loop until first lookzone
             row = row + 1
             if row >= sheet.nrows: # looped through entire sheet
-                raise IPatchException("Incorrectly Formated Worksheet") # don't loop forever
+                raise IPatchException("Incorrectly Formatted Worksheet") # don't loop forever
         row = row + 1
 
         while row < sheet.nrows:
@@ -122,7 +123,7 @@ class WorkbookReader():
         while sheet.cell_value(row,0) != SLIDE_STRING: # Loop until first slide metric
             row = row + 1
             if row >= sheet.nrows: # means we looped through entire sheet
-                raise IPatchException("Incorrectly Formated Worksheet") # don't loop forever
+                raise IPatchException("Incorrectly Formatted Worksheet") # don't loop forever
         row = row + 1
 
         while sheet.cell_value(row,0) != LOOKZONE_STRING:

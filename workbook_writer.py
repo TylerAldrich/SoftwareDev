@@ -6,12 +6,13 @@ from ipatch_exception import IPatchException
 MAX_SHEET_NAME_LENGTH = 31
 
 class WorkbookWriter():
-    def __init__(self, readers, output, attributes):
+    def __init__(self, readers, output, attributes, listener=None):
         """ Instantiated with a list of workbook_readers, filename for lookzone output, and
         filename for slide metrics output, and a list of attributes"""
         self.readers = readers
         self.output = output
         self.attributes = attributes
+        self.listener = listener
         self.book = xlwt.Workbook() # Create the book
         self.attribute_sheets = {}
         self.header_to_col_num = {}
@@ -31,7 +32,14 @@ class WorkbookWriter():
         row_num = 1
         for reader in self.readers:
             self.write_reader(reader, row_num)
+            try:
+                self.listener.notifier(row_num)
+            except Exception as e:
+                print('encountered exception in notifier:')
+                print(str(e))
+                pass
             row_num += 1
+
         self.write_key()
         self.book.save(self.output)
 
@@ -56,13 +64,13 @@ class WorkbookWriter():
 
 class LookzoneWriter(WorkbookWriter):
 
-    def __init__(self, readers, output, attrs):
+    def __init__(self, readers, output, attrs, listener=None):
         """ Initialize instance of a lookzone writer.
         @Params: readers - Listof WorkbookReader
                 output - String: Path to output file
                 attrs - (Listof String): Desired Attributes
         """
-        WorkbookWriter.__init__(self,readers,output,attrs)
+        WorkbookWriter.__init__(self, readers, output, attrs, listener)
 
 
     def write_headers(self, readers):
@@ -148,13 +156,13 @@ repeat
 """
 
 class SlideMetricWriter(WorkbookWriter):
-    def __init__(self, readers, output, attrs):
+    def __init__(self, readers, output, attrs, listener=None):
         """ Initialize instance of a lookzone writer.
         @Params: readers - Listof WorkbookReader
                 output - String: Path to output file
                 attrs - (Listof String): Desired Attributes
         """
-        WorkbookWriter.__init__(self,readers,output,attrs)
+        WorkbookWriter.__init__(self, readers, output, attrs, listener)
 
     def __get_header(self, stat):
         """ Returns header for a given stat sheet and lookzone object """
