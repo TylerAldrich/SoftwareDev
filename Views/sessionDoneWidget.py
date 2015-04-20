@@ -5,6 +5,7 @@ import sys
 from sys import argv
 from PyQt4 import QtGui, QtCore
 from navigation import NavigationWidget
+from clickable_qlabel import ClickableQLabel
 
 # Widget that has user browse for an input file
 class SessionDoneWidget(QtGui.QWidget):
@@ -28,13 +29,17 @@ class SessionDoneWidget(QtGui.QWidget):
 
     if len(self.slideFilePath):
       slideFileMsgLabel = QtGui.QLabel('Output file generated successfully with chosen <b>Slide Metric</b> data from given files. See generated ouput at:', self)
-      slideFilePathLabel = QtGui.QLabel(self.slideFilePath, self)
+      slideFilePathLabel = ClickableQLabel(self.slideFilePath, self)
+      self.connect(slideFilePathLabel, QtCore.SIGNAL('clicked()'), self.openSlideOutput)
+      slideFilePathLabel.setCursor(QtCore.Qt.PointingHandCursor)
       layout.addWidget(slideFileMsgLabel)
       layout.addWidget(slideFilePathLabel)
 
     if len(self.lookzoneFilePath):
       lookzoneFileMsgLabel = QtGui.QLabel('Output file generated successfully with chosen <b>LookZone</b> data from given files. See generated ouput at:', self)
-      lookzoneFilePathLabel = QtGui.QLabel(self.lookzoneFilePath, self)
+      lookzoneFilePathLabel = ClickableQLabel(self.lookzoneFilePath, self)
+      self.connect(lookzoneFilePathLabel, QtCore.SIGNAL('clicked()'), self.openLookzoneOutput)
+      lookzoneFilePathLabel.setCursor(QtCore.Qt.PointingHandCursor)
       layout.addWidget(lookzoneFileMsgLabel)
       layout.addWidget(lookzoneFilePathLabel)
 
@@ -44,7 +49,6 @@ class SessionDoneWidget(QtGui.QWidget):
       layout.addWidget(configFileMsgLabel)
       layout.addWidget(configFilePathLabel)
 
-    # TODO: Refactor this code to use NavigationWidget
     navigationWidgetWrapper = QtGui.QWidget(self) 
     navigationLayout = QtGui.QHBoxLayout(navigationWidgetWrapper)
     self.quitBtn = QtGui.QPushButton('Quit iPatch')
@@ -57,3 +61,11 @@ class SessionDoneWidget(QtGui.QWidget):
     navigationLayout.addWidget(self.newSessionBtn)
     self.newSessionBtn.clicked.connect(self.window.showLoadFileView)
     layout.addWidget(navigationWidgetWrapper)
+
+  def openSlideOutput(self):
+    outputPath = QtCore.QUrl("file:///" + self.slideFilePath, QtCore.QUrl.TolerantMode)
+    result = QtGui.QDesktopServices.openUrl(outputPath);
+
+  def openLookzoneOutput(self):
+    outputPath = QtCore.QUrl("file:///" + self.lookzoneFilePath, QtCore.QUrl.TolerantMode)
+    result = QtGui.QDesktopServices.openUrl(outputPath);

@@ -61,7 +61,6 @@ class SaveFileWidget(QtGui.QWidget):
     ## Save config file section
     configTitleLabel = QtGui.QLabel('Make Configurations File <b>(Optional)</b>', self)
     configSubtitleLabel = QtGui.QLabel('Choose a location to create a configurations file to save these selected attributes for a later experiment', self)
-    # TODO: swap previous line with next one once we figure out QLabel wrapping
     # configSubtitleLabel = QtGui.QLabel('Choose a location to create a configurations file to save these selected attributes for a later experiment. This is recommended in order to save you time in the future - simply load this configuration file next time you start a session and all your chosen attributes will be pre-selected for you.', self)
 
     # Add two labels to layout
@@ -110,21 +109,24 @@ class SaveFileWidget(QtGui.QWidget):
     self.slide_error_msg_label = QtGui.QLabel('')
     layout.addWidget(self.slide_error_msg_label)
 
-    return layout;
+    return layout
 
   def writeOutputs(self):
+    output_file_paths = {}
+    output_file_paths['slide_metrics_path'] = ''
+    output_file_paths['lookzone_data_path'] = ''
+    output_file_paths['config_file_path'] = ''
     if len(self.slide_attrs):
-      # Save slide metrics data
-      self.window.saveSlideMetricsData(self.slideFileName, self.slide_attrs)
+      output_file_paths['slide_metrics_path'] = self.slideFileName
 
     if len(self.lookzone_attrs):
-      # Save Lookzone metrics data
-      self.window.saveLookzoneData(self.lookzoneFileName, self.lookzone_attrs)
+      output_file_paths['lookzone_data_path'] = self.lookzoneFileName
 
     self.configFileName = self.configFileEdit.text()
     if len(self.configFileName):
-      # Save the attributes in a configuration file
-      self.window.saveConfigFile(self.configFileName, self.slide_attrs, self.lookzone_attrs)
+      output_file_paths['config_file_path'] = self.configFileName
+
+    self.window.showWriteProgressView(output_file_paths, self.slide_attrs, self.lookzone_attrs)
 
   # go back to attribute selection view
   def goBack(self):
@@ -154,10 +156,6 @@ class SaveFileWidget(QtGui.QWidget):
   def switchViews(self):
     if self.validateInputs():
       self.writeOutputs()
-      # We want to clear the chosen attributes when starting a new session
-      self.window.clearAttributesState()
-      # TODO: We would show progress bar view instead, which would go to Done only on success
-      self.window.showDoneView(self.slideFileName, self.lookzoneFileName, self.configFileName)
 
   # open a file dialog to pick an xlsx input file for lookzone data
   def selectLookzoneLoc(self):

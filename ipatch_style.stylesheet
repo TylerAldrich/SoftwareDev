@@ -67,3 +67,7 @@ QPushButton:hover
 {
     border: 2px solid #c9b27b;
 }
+ClickableQLabel
+{
+  color: blue;
+}
