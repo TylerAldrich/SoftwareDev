@@ -16,11 +16,12 @@ class WorkbookReader():
         except IOError as e:
             raise IPatchException("File does not exist")
         except:
-            raise IPatchException("File could not be opened") 
+            raise IPatchException("File could not be opened")
         self._stat_sheets = []
         self._data_dict = {}
         self.workbook_filename = workbook_file
         self.get_sheets()
+        del self.workbook
 
     def get_sheets(self):
         """ Return needed sheets from the workbook (end in STAT) """
@@ -65,7 +66,8 @@ class WorkbookReader():
 
 
     def _valid_lookzone_value(self, v):
-        return not re.match("ATT_.*|LookZone.*|LOOKZONE.*|Vertex.*", v)
+        return not re.match("ATT_.*|LookZone.*|LOOKZONE.*|Vertex.*|.*[Ll]ower right [xy].*|.*[Ll]ower left [xy].*|" +
+                            ".*[Uu]pper right [xy].*|.*[Uu]pper left [xy].*", v)
 
     def _valid_slidemetric_value(self, v):
         return v != SLIDE_STRING
