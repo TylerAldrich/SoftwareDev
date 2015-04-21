@@ -8,16 +8,21 @@ TEST_WORKBOOK_1 = 'sample_inputs/191144- ATT 2 NEG.xlsx'
 TEST_WORKBOOK_2 = 'sample_inputs/191150- ATT 2 NEG.xlsx'
 TEST_WORKBOOK_3 = 'test_xls/test_sheet_count.xls'
 
+TEST_PARTIAL_1 = 'Test_Files/69420 - TestInputOne.xls'
+TEST_PARTIAL_2 = 'Test_Files/42069 - TestInputTwo.xls'
+
 class TestWorkbookMethods(unittest.TestCase):
 
     def setUp(self):
         self.workbook1 = WorkbookReader(TEST_WORKBOOK_1)
         self.workbook2 = WorkbookReader(TEST_WORKBOOK_2)
         self.workbook3 = WorkbookReader(TEST_WORKBOOK_3)
+        self.partial1  = WorkbookReader(TEST_PARTIAL_1)
+        self.partial2  = WorkbookReader(TEST_PARTIAL_2)
 
-        self.wb1_sheets = self.workbook1.get_sheets()
-        self.wb2_sheets = self.workbook2.get_sheets()
-        self.wb3_sheets = self.workbook3.get_sheets()
+        self.wb1_sheets = self.workbook1.get_sheet_names()
+        self.wb2_sheets = self.workbook2.get_sheet_names()
+        self.wb3_sheets = self.workbook3.get_sheet_names()
 
     def sheets_equal(self, sheet1, sheet2):
         # Internal method:  Determine if the two given sheets are equivalent
@@ -75,7 +80,7 @@ class TestWorkbookMethods(unittest.TestCase):
         # number of values
         hsh_len = 2
         slide_len = 37
-        lookzone_len = 56
+        lookzone_len = 40
 
         attrs1 = self.workbook1.get_attributes()
         attrs2 = self.workbook2.get_attributes()
@@ -145,8 +150,31 @@ class TestWorkbookMethods(unittest.TestCase):
 
         self.assertTrue(self.books_equal(expected_book,resulting_book))
 
-    # TODO : Get real data files with varying amounts of information (like kimberly has,
-    # with a bunch of blanks and stuff) and create tests for that
+    def test_write_partial_slide_metrics(self):
+        # Test output of SlideMetricWrtier when input files dont all contain the same
+        # fields, have partially missing data
+        output_path = "./Test_Files/TestPartialSlideMetricOutput.xls"
+        expected_output_path = "./Test_Files/PartialSlideMetricOutput.xls"
+        test_attrs = ["Bananas Per Second", "Grapes Per Second"]
+        slide_writer = SlideMetricWriter([self.partial2, self.partial1], output_path, test_attrs)
+        slide_writer.write_readers()
+        expected_book = xlrd.open_workbook(expected_output_path)
+        resulting_book = xlrd.open_workbook(output_path)
+
+        self.assertTrue(self.books_equal(expected_book,resulting_book))
+
+    def test_write_partial_lookzones(self):
+        # Test output of LookzoneWrtier when input files dont all contain the same
+        # fields, have partially missing data
+        output_path = "./Test_Files/TestPartialLookzoneOutput.xls"
+        expected_output_path = "./Test_Files/PartialLookzoneOutput.xls"
+        test_attrs = ["Apple", "Banana", "Grape", "Orange"]
+        lookzone_writer = LookzoneWriter([self.partial2, self.partial1], output_path, test_attrs)
+        lookzone_writer.write_readers()
+        expected_book = xlrd.open_workbook(expected_output_path)
+        resulting_book = xlrd.open_workbook(output_path)
+
+        self.assertTrue(self.books_equal(expected_book,resulting_book))
 
 if __name__ == '__main__':
     unittest.main()
