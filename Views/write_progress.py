@@ -69,8 +69,6 @@ class WriteProgress(QtGui.QWidget):
       self.writingFilesTask.notifyProgress.connect(self.onLookzoneProgress)
     if (i == 2):
       # done writing lookzone data
-      # We want to clear the chosen attributes when starting a new session
-      self.window.clearGuiState()
       # show the final success screen
       self.window.showDoneView(self.output_file_paths['slide_metrics_path'], self.output_file_paths['lookzone_data_path'], self.output_file_paths['config_file_path'])
 

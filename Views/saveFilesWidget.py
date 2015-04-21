@@ -28,13 +28,13 @@ class SaveFileWidget(QtGui.QWidget):
     # Get the current directory to prepopulate the file lines
     self.current_directory = os.path.dirname(os.path.realpath(__file__)) + '/'
 
-		## Save Slide metrics section
+		# Save Slide metrics section
     if len(self.slide_attrs) > 0:
       layout.addLayout(self.makeSlideBrowseOutput())
 
-    ## Save lookzone section
+    # Save lookzone section
     if len(self.lookzone_attrs) > 0:
-      lookTitleLabel = QtGui.QLabel('Save Lookzone File', self)
+      lookTitleLabel = QtGui.QLabel('<b>Save Lookzone File</b>', self)
       lookSubtitleLabel = QtGui.QLabel('Click browse to select a location to save your LookZone data', self)
 
       # Add two labels to layout
@@ -49,6 +49,7 @@ class SaveFileWidget(QtGui.QWidget):
       self.lookzoneFileEdit = QtGui.QLineEdit()
       self.lookzoneFileEdit.setText(self.current_directory)
       browseLookzoneButton = QtGui.QPushButton('Browse')
+      browseLookzoneButton.setCursor(QtCore.Qt.PointingHandCursor)
       browseLookzoneFileLayout.addWidget(self.lookzoneFileEdit)
       browseLookzoneFileLayout.addWidget(browseLookzoneButton)
       browseLookzoneButton.clicked.connect(self.selectLookzoneLoc)
@@ -58,35 +59,58 @@ class SaveFileWidget(QtGui.QWidget):
       self.lookzone_error_msg_label = QtGui.QLabel('')
       layout.addWidget(self.lookzone_error_msg_label)
 
-    ## Save config file section
-    configTitleLabel = QtGui.QLabel('Make Configurations File <b>(Optional)</b>', self)
-    configSubtitleLabel = QtGui.QLabel('Choose a location to create a configurations file to save these selected attributes for a later experiment', self)
-    # configSubtitleLabel = QtGui.QLabel('Choose a location to create a configurations file to save these selected attributes for a later experiment. This is recommended in order to save you time in the future - simply load this configuration file next time you start a session and all your chosen attributes will be pre-selected for you.', self)
 
-    # Add two labels to layout
-    layout.addWidget(configTitleLabel)
+    self.showSaveConfigCheckbox = QtGui.QCheckBox('Save attributes to iPatch configuration file')
+    self.showSaveConfigCheckbox.stateChanged.connect(self.showSaveConfig)
+    self.showSaveConfigCheckbox.setToolTip('Make a <b>*.ipatch</b> config file to automatically save all the saved attributes to use in other sessions')
+
+    layout.addWidget(self.showSaveConfigCheckbox)
+
+    self.saveConfigView = self.makeSaveConfigView()
+    layout.addWidget(self.saveConfigView)
+
+    navigation = NavigationWidget(self.window, self.goBack, self.switchViews)
+    layout.addWidget(navigation)
+
+  # show or hide the save config file view
+  def showSaveConfig(self, state):
+    if state == QtCore.Qt.Checked:
+      # show the load config file widgets
+      self.saveConfigView.show()
+    else:
+      self.saveConfigView.hide()
+
+  # build save config file view (hidden initially until checked)
+  def makeSaveConfigView(self):
+    widget = QtGui.QWidget(self)
+    # Create initial vertical layout
+    layout = QtGui.QVBoxLayout(widget)
+    layout.setAlignment(QtCore.Qt.AlignTop)
+
+    configSubtitleLabel = QtGui.QLabel('Choose a location to create a configurations file to save these selected attributes for a later experiment. This is recommended in order to save you time in the future - simply load this configuration file next time you start a session and all your chosen attributes will be pre-selected for you.', self)
+    configSubtitleLabel.setWordWrap(True)
     layout.addWidget(configSubtitleLabel)
 
     # Horizontal layout is for the text box and browse button
     browseConfigFileLayout = QtGui.QHBoxLayout(self)
 
-    # Init text edit box for file path and browse button to
-    # find the file.  Set browse button on click to selectFile function
     self.configFileEdit = QtGui.QLineEdit()
     browseConfigButton = QtGui.QPushButton('Browse')
+    browseConfigButton.setCursor(QtCore.Qt.PointingHandCursor)
     browseConfigFileLayout.addWidget(self.configFileEdit)
     browseConfigFileLayout.addWidget(browseConfigButton)
     browseConfigButton.clicked.connect(self.selectConfigLoc)
     # Add horizontal layout to overall layout
     layout.addLayout(browseConfigFileLayout)
 
-    navigation = NavigationWidget(self.window, self.goBack, self.switchViews)
-    layout.addWidget(navigation)
+    widget.hide()
+    return widget
 
+  # make slide metrics output save view
   def makeSlideBrowseOutput(self):
     layout = QtGui.QVBoxLayout(self)
 
-    titleLabel = QtGui.QLabel('Save Slide Metrics File', self)
+    titleLabel = QtGui.QLabel('<b>Save Slide Metrics File</b>', self)
     subtitleLabel = QtGui.QLabel('Click browse to select a location to save your Slide Metrics data', self)
 
     # Add two labels to layout
@@ -95,8 +119,7 @@ class SaveFileWidget(QtGui.QWidget):
 
     # Horizontal layout is for the text box and browse button
     browseFileLayout = QtGui.QHBoxLayout(self)
-    # Init text edit box for file path and browse button to
-    # find the file.  Set browse button on click to selectFile function
+    # Init text edit box for file path and browse button
     self.fileTextEdit = QtGui.QLineEdit()
     self.fileTextEdit.setText(self.current_directory)
     browseButton = QtGui.QPushButton('Browse')
@@ -111,6 +134,7 @@ class SaveFileWidget(QtGui.QWidget):
 
     return layout
 
+  # write the output files
   def writeOutputs(self):
     output_file_paths = {}
     output_file_paths['slide_metrics_path'] = ''
@@ -132,6 +156,7 @@ class SaveFileWidget(QtGui.QWidget):
   def goBack(self):
     self.window.showSelectAttributesView()
 
+  # check that input paths are valid
   def validateInputs(self):
     foundError = False
 

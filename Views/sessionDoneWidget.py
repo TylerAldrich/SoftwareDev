@@ -52,14 +52,16 @@ class SessionDoneWidget(QtGui.QWidget):
     navigationWidgetWrapper = QtGui.QWidget(self) 
     navigationLayout = QtGui.QHBoxLayout(navigationWidgetWrapper)
     self.quitBtn = QtGui.QPushButton('Quit iPatch')
+    self.quitBtn.setCursor(QtCore.Qt.PointingHandCursor)
     navigationLayout.addWidget(self.quitBtn)
     self.quitBtn.clicked.connect(self.window.closeApp)
     navigationLayout.addWidget(self.quitBtn)
 
     navigationLayout.addStretch(1)
     self.newSessionBtn = QtGui.QPushButton('Start new session')
+    self.newSessionBtn.setCursor(QtCore.Qt.PointingHandCursor)
     navigationLayout.addWidget(self.newSessionBtn)
-    self.newSessionBtn.clicked.connect(self.window.showLoadFileView)
+    self.newSessionBtn.clicked.connect(self.window.start_new)
     layout.addWidget(navigationWidgetWrapper)
 
   def openSlideOutput(self):
