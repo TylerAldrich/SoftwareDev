@@ -26,7 +26,7 @@ class SaveFileWidget(QtGui.QWidget):
     layout.setAlignment(QtCore.Qt.AlignTop)
 
     # Get the current directory to prepopulate the file lines
-    self.current_directory = os.path.dirname(os.path.realpath(__file__)) + '/'
+    self.current_directory = os.path.join(os.path.expanduser('~'), 'Desktop') + '/'
 
 		## Save Slide metrics section
     if len(self.slide_attrs) > 0:
@@ -47,7 +47,7 @@ class SaveFileWidget(QtGui.QWidget):
       # Init text edit box for file path and browse button to
       # find the file.  Set browse button on click to selectFile function
       self.lookzoneFileEdit = QtGui.QLineEdit()
-      self.lookzoneFileEdit.setText(self.current_directory)
+      self.lookzoneFileEdit.setText(self.current_directory + 'lookzone.xls')
       browseLookzoneButton = QtGui.QPushButton('Browse')
       browseLookzoneFileLayout.addWidget(self.lookzoneFileEdit)
       browseLookzoneFileLayout.addWidget(browseLookzoneButton)
@@ -98,7 +98,7 @@ class SaveFileWidget(QtGui.QWidget):
     # Init text edit box for file path and browse button to
     # find the file.  Set browse button on click to selectFile function
     self.fileTextEdit = QtGui.QLineEdit()
-    self.fileTextEdit.setText(self.current_directory)
+    self.fileTextEdit.setText(self.current_directory + 'slide.xls')
     browseButton = QtGui.QPushButton('Browse')
     browseFileLayout.addWidget(self.fileTextEdit)
     browseFileLayout.addWidget(browseButton)
@@ -142,6 +142,9 @@ class SaveFileWidget(QtGui.QWidget):
       if not len(self.slideFileName) or not regex_format.match(self.slideFileName):
         self.slide_error_msg_label.setText('<b style="color:red">You must select a valid output location for Slide Metrics.</b>')
         foundError = True
+
+      if os.path.isfile(self.slideFileName):
+
 
     if len(self.lookzone_attrs):
       self.lookzoneFileName = self.lookzoneFileEdit.text()

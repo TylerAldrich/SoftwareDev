@@ -16,12 +16,13 @@ class FilePathWidget(QtGui.QWidget):
   def initUI(self):
     layout = QtGui.QHBoxLayout(self)
 
-    file_label = QtGui.QLabel(self.file_path)
-    layout.addWidget(file_label)
-
     remove_button = QtGui.QPushButton('Remove')
     layout.addWidget(remove_button)
     remove_button.clicked.connect(self.removeFile)
+
+    file_label = QtGui.QLabel(self.file_path)
+    layout.addWidget(file_label)
+
 
   def removeFile(self):
     self.parent.removeFile(self.file_path)
