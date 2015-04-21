@@ -26,7 +26,7 @@ class Window(QtGui.QMainWindow):
   def __init__(self):
     super(Window, self).__init__()
     self.appName = 'iPatch'
-    self.appVersion = 'v0.1'
+    self.appVersion = 'v1.0'
     self.appWidth = 700
     self.appHeight = 500
     # save a Dict that caches the state of certain GUI elements
@@ -43,13 +43,14 @@ class Window(QtGui.QMainWindow):
     self.resize(self.appWidth, self.appHeight)
     self.center()
     self.setWindowTitle(self.appName + ' ' + self.appVersion)
+    self.setWindowIcon(QtGui.QIcon('eyecon.png'))
     self.show()
     # Load up the Load file view
     self.showLoadFileView()
 
     # Add a menu bar where the user can start over or quit
     menu = self.menuBar().addMenu('File')
-    menu.addAction('New Experiment', self.start_new)
+    menu.addAction('New Session', self.start_new)
     menu.addAction('Quit', self.closeApp)
 
   def set_style(self):
@@ -81,9 +82,11 @@ class Window(QtGui.QMainWindow):
     else:
       event.ignore()
 
+  # close the application window
   def closeApp(self):
     self.close()
 
+  # clear state and start a new session
   def start_new(self):
     reply = QtGui.QMessageBox.question(self, 'Message',
       "Are you sure you want to start a new session?", QtGui.QMessageBox.Yes |
@@ -160,14 +163,6 @@ class Window(QtGui.QMainWindow):
   # Function to clear the state of the attributes screen after saving
   def clearAttributesState(self):
     self.guiState = {}
-    # if self.guiState.has_key(SlideMetricsAttrListsComponent.guiStateKey):
-    #   del self.guiState[SlideMetricsAttrListsComponent.guiStateKey]
-
-    # if self.guiState.has_key(LookzoneAttrListsComponent.guiStateKey):
-    #   del self.guiState[LookzoneAttrListsComponent.guiStateKey]
-
-    # if self.guiState.has_key(LoadFileWidget.guiStateKey):
-    #   del self.guiState[LoadFileWidget.guiStateKey]
 
 # Main function to run everything
 def main():
