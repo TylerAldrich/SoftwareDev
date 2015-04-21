@@ -95,6 +95,7 @@ class SaveFileWidget(QtGui.QWidget):
     browseConfigFileLayout = QtGui.QHBoxLayout(self)
 
     self.configFileEdit = QtGui.QLineEdit()
+    self.configFileEdit.setText(self.current_directory + 'config.ipatch')
     browseConfigButton = QtGui.QPushButton('Browse')
     browseConfigButton.setCursor(QtCore.Qt.PointingHandCursor)
     browseConfigFileLayout.addWidget(self.configFileEdit)
@@ -147,7 +148,7 @@ class SaveFileWidget(QtGui.QWidget):
       output_file_paths['lookzone_data_path'] = self.lookzoneFileName
 
     self.configFileName = self.configFileEdit.text()
-    if len(self.configFileName):
+    if len(self.configFileName) and self.saveConfigView.isVisible():
       output_file_paths['config_file_path'] = self.configFileName
 
     self.window.showWriteProgressView(output_file_paths, self.slide_attrs, self.lookzone_attrs)
