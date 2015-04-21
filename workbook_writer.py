@@ -62,6 +62,7 @@ class WorkbookWriter():
         """ This method prints only the first reader of the writer """
         self.write_reader(self.readers[0])
 
+
 class LookzoneWriter(WorkbookWriter):
 
     def __init__(self, readers, output, attrs, listener=None):
@@ -148,12 +149,7 @@ class LookzoneWriter(WorkbookWriter):
                             raise IPatchException("Could not write attribute: {0}".format(attribute))
                     current_lookzone_num += 1
                 current_lookzone_num = 1
-"""
-mapping from column header -> column number
-get column header for each lookzone we go through
-get column number to write that data to
-repeat
-"""
+
 
 class SlideMetricWriter(WorkbookWriter):
     def __init__(self, readers, output, attrs, listener=None):
