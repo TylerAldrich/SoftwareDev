@@ -8,7 +8,12 @@ MAX_SHEET_NAME_LENGTH = 31
 class WorkbookWriter():
     def __init__(self, readers, output, attributes, listener=None):
         """ Instantiated with a list of workbook_readers, filename for lookzone output, and
-        filename for slide metrics output, and a list of attributes"""
+        filename for slide metrics output, and a list of attributes
+
+        WorkbookWriter is a parent class to LookzoneWriter and SlideMetricWriter,
+        which handle writing output workbook sheets, headers, keys, and data from
+        the given WorkbookReaders
+        """
         self.readers = readers
         self.output = output
         self.attributes = attributes

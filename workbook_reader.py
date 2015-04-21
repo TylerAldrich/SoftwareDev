@@ -10,8 +10,15 @@ LOOKZONE_STRING = "LOOKZONE METRICS:"
 SLIDE_STRING    = "SLIDE METRICS:"
 
 class WorkbookReader():
-    """ Wraps the xlrd Book object """
     def __init__(self, workbook_file):
+        """ Wraps the xlrd Book object
+        WorkbookReader reads input files STAT sheets and puts all slidemetric and
+        lookzone data into objects stored in dictionaries.
+
+        After initializing this object, all attributes and data are computed and stored
+        immediately, and xlrd sheet references are then deleted to get rid of memory overhead
+        and to speed up data retreival.
+        """
         try:
             self.workbook = xlrd.open_workbook(workbook_file)
         except IOError as e:

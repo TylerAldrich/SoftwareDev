@@ -2,6 +2,13 @@ import pprint
 
 class Metrics():
     def __init__(self, name):
+        """
+        Metrics serves as a parent to both Lookzone and Slidemetrics,
+        and is used to store attribute data for input workbooks.
+
+        Lookzone and Slidemetrics add no functionality but are named
+        to make their purpose more clear in the WorkbookReader class.
+        """
         self.data = {}
         self.name = name
 
