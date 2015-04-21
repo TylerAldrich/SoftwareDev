@@ -169,7 +169,13 @@ class SaveFileWidget(QtGui.QWidget):
         foundError = True
 
       if os.path.isfile(self.slideFileName):
+        file_split = self.slideFileName.split('\\')
+        file_name = file_split[-1]
+        foundError = self.showOverwriteMessage(file_name)
 
+        # If they selected to not overwrite the file, return immediately
+        if foundError:
+          return not foundError
 
     if len(self.lookzone_attrs):
       self.lookzoneFileName = self.lookzoneFileEdit.text()
@@ -178,7 +184,28 @@ class SaveFileWidget(QtGui.QWidget):
         self.lookzone_error_msg_label.setText('<b style="color:red">You must select a valid output location for LookZone Data.</b>')
         foundError = True
 
+      if os.path.isfile(self.lookzoneFileName):
+        file_split = self.lookzoneFileName.split('\\')
+        file_name = file_split[-1]
+        foundError = self.showOverwriteMessage(file_name)
+
+        # If they selected to not overwrite the file, return immediately
+        if foundError:
+          return not foundError
+
     return not foundError
+
+  # Show error message for file already saved in that location
+  def showOverwriteMessage(self, file_name):
+    message = file_name + ' Already exists in this location, do you want to overwrite it?'
+    reply = QtGui.QMessageBox.question(self, 'Message',
+      message, QtGui.QMessageBox.Yes |
+      QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+
+    if reply == QtGui.QMessageBox.No:
+      return True
+    else:
+      return False
 
   # go to next view to select data attributes
   def switchViews(self):
