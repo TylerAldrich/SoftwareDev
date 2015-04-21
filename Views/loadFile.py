@@ -44,6 +44,7 @@ class LoadFileWidget(QtGui.QWidget):
     # find the file.  Set browse button on click to selectFile function
     self.fileTextEdit = QtGui.QLineEdit()
     browse_button = QtGui.QPushButton('Browse')
+    browse_button.setCursor(QtCore.Qt.PointingHandCursor)
     browse_file_layout.addWidget(self.fileTextEdit)
     browse_file_layout.addWidget(browse_button)
     browse_button.clicked.connect(self.selectFile)
@@ -66,8 +67,10 @@ class LoadFileWidget(QtGui.QWidget):
     add_remove_layout = QtGui.QHBoxLayout(self)
     self.clear_all_button = QtGui.QPushButton('Clear All')
     self.clear_all_button.clicked.connect(self.clearAllFiles)
+    self.clear_all_button.setCursor(QtCore.Qt.PointingHandCursor)
     self.add_file_button = QtGui.QPushButton('Add Another File')
     self.add_file_button.clicked.connect(self.addAnotherFile)
+    self.add_file_button.setCursor(QtCore.Qt.PointingHandCursor)
     self.clear_all_button.hide()
     self.add_file_button.hide()
 
@@ -78,6 +81,7 @@ class LoadFileWidget(QtGui.QWidget):
 
     self.showLoadConfigCheckbox = QtGui.QCheckBox('Load attributes from iPatch configuration file')
     self.showLoadConfigCheckbox.stateChanged.connect(self.showLoadConfig)
+    self.showLoadConfigCheckbox.setToolTip('Choose a <b>*.ipatch</b> config file to automatically select all the saved attributes in the file')
 
     layout.addWidget(self.showLoadConfigCheckbox)
 
@@ -112,6 +116,7 @@ class LoadFileWidget(QtGui.QWidget):
     if len(self.window.configFilePath):
       self.configFileTextEdit.setText(self.window.configFilePath)
     browseButton = QtGui.QPushButton('Browse')
+    browseButton.setCursor(QtCore.Qt.PointingHandCursor)
     browseFileLayout.addWidget(self.configFileTextEdit)
     browseFileLayout.addWidget(browseButton)
     browseButton.clicked.connect(self.selectConfigFile)

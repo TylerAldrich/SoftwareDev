@@ -30,6 +30,7 @@ class AttributeListsComponent(QtGui.QWidget):
     # Add/Remove attributes button
     self.addAttributeButton = QtGui.QPushButton('Add')
     self.addAttributeButton.setMinimumWidth(100)
+    self.addAttributeButton.setCursor(QtCore.Qt.PointingHandCursor)
     attributesView.addWidget(self.addAttributeButton)
     self.addAttributeButton.clicked.connect(self.moveAttributes)
     # add selected attrs list view
@@ -42,12 +43,12 @@ class AttributeListsComponent(QtGui.QWidget):
   # initialize a dict keeping track of whether each attribute is chosen or not
   def initAttributesState(self):
     attrs_are_chosen = OrderedDict()
-    num_attrs = len(self.attributes)
-    for i in xrange(num_attrs):
+    self.num_attrs = len(self.attributes)
+    for i in xrange(self.num_attrs):
       attrs_are_chosen[self.attributes[i]] = False
 
-    num_selected_attrs = len(self.selectedAttributes)
-    for i in xrange(num_selected_attrs):
+    self.num_selected_attrs = len(self.selectedAttributes)
+    for i in xrange(self.num_selected_attrs):
       attrs_are_chosen[self.selectedAttributes[i]] = True
     
     return attrs_are_chosen
@@ -65,14 +66,14 @@ class AttributeListsComponent(QtGui.QWidget):
 
   # construct and return layout containing choose attrs list and filterbox
   def makeChooseAttrsList(self):
-    ## setup list view test
+    # setup list view test
     attributesLayout = QtGui.QVBoxLayout(self)
 
     # build filter searchbox
     self.attributeSearchBar = self.makeSearch(self.filterAttributes, self.filter)
 
     # Add label and search bar for selecting attributes
-    attributesLabel = QtGui.QLabel('Select Attributes', self)
+    attributesLabel = QtGui.QLabel('<b>Choose Attributes</b>', self)
     attributesLayout.addWidget(attributesLabel)
     attributesLayout.addWidget(self.attributeSearchBar)
     # build list widget and add to layout
@@ -91,15 +92,21 @@ class AttributeListsComponent(QtGui.QWidget):
     # Build the clear all button
     self.clear_all_button = QtGui.QPushButton('Clear All')
     self.clear_all_button.clicked.connect(self.clearAllAttrs)
+    self.clear_all_button.setCursor(QtCore.Qt.PointingHandCursor)
 
     # label for list
-    selectedLabel = QtGui.QLabel('Selected Attributes', self)
+    selectedLabel = QtGui.QLabel('<b>Selected Attributes</b>', self)
     selectedLayout.addWidget(selectedLabel)
     selectedLayout.addWidget(self.chosen_search_bar)
     # build selected attributes list and add to layout
     self.selectedListWidget = self.createListWidget(self.attributes, self.buttonTextRemove)
     self.filterChosen()
+
+    # build the label for the selected attributes count
+    self.selected_count_label = QtGui.QLabel('', self)
+    self.updateCount()
     selectedLayout.addWidget(self.selectedListWidget)
+    selectedLayout.addWidget(self.selected_count_label)
     selectedLayout.addWidget(self.clear_all_button)
     return selectedLayout
 
@@ -135,8 +142,10 @@ class AttributeListsComponent(QtGui.QWidget):
     selectedList = []
     for i in selectedItems:
       self.attributes_are_chosen[str(i.text())] = True
+      self.num_selected_attrs += 1
     self.filterAttributes()
     self.filterChosen()
+    self.updateCount()
 
   # move selected attrs in selected list to the choose list
   def removeAttribute(self):
@@ -144,8 +153,14 @@ class AttributeListsComponent(QtGui.QWidget):
     removedList = []
     for i in selectedItems:
       self.attributes_are_chosen[str(i.text())] = False
+      self.num_selected_attrs -= 1
     self.filterAttributes()
     self.filterChosen()
+    self.updateCount()
+
+  # update label with amount of selected attributes
+  def updateCount(self):
+    self.selected_count_label.setText(str(self.num_selected_attrs) + ' of ' + str(self.num_attrs) + ' attributes selected')
 
   # save GUI state (lists and filterbox) to the window
   def saveState(self):
