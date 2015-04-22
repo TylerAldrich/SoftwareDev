@@ -26,7 +26,7 @@ class SaveFileWidget(QtGui.QWidget):
     layout.setAlignment(QtCore.Qt.AlignTop)
 
     # Get the current directory to prepopulate the file lines
-    self.current_directory = os.path.dirname(os.path.realpath(__file__)) + '/'
+    self.current_directory = os.path.join(os.path.expanduser('~'), 'Desktop') + '/'
 
 		# Save Slide metrics section
     if len(self.slide_attrs) > 0:
@@ -47,7 +47,7 @@ class SaveFileWidget(QtGui.QWidget):
       # Init text edit box for file path and browse button to
       # find the file.  Set browse button on click to selectFile function
       self.lookzoneFileEdit = QtGui.QLineEdit()
-      self.lookzoneFileEdit.setText(self.current_directory)
+      self.lookzoneFileEdit.setText(self.current_directory + 'lookzone.xls')
       browseLookzoneButton = QtGui.QPushButton('Browse')
       browseLookzoneButton.setCursor(QtCore.Qt.PointingHandCursor)
       browseLookzoneFileLayout.addWidget(self.lookzoneFileEdit)
@@ -95,6 +95,7 @@ class SaveFileWidget(QtGui.QWidget):
     browseConfigFileLayout = QtGui.QHBoxLayout(self)
 
     self.configFileEdit = QtGui.QLineEdit()
+    self.configFileEdit.setText(self.current_directory + 'config.ipatch')
     browseConfigButton = QtGui.QPushButton('Browse')
     browseConfigButton.setCursor(QtCore.Qt.PointingHandCursor)
     browseConfigFileLayout.addWidget(self.configFileEdit)
@@ -121,7 +122,7 @@ class SaveFileWidget(QtGui.QWidget):
     browseFileLayout = QtGui.QHBoxLayout(self)
     # Init text edit box for file path and browse button
     self.fileTextEdit = QtGui.QLineEdit()
-    self.fileTextEdit.setText(self.current_directory)
+    self.fileTextEdit.setText(self.current_directory + 'slide.xls')
     browseButton = QtGui.QPushButton('Browse')
     browseFileLayout.addWidget(self.fileTextEdit)
     browseFileLayout.addWidget(browseButton)
@@ -146,8 +147,7 @@ class SaveFileWidget(QtGui.QWidget):
     if len(self.lookzone_attrs):
       output_file_paths['lookzone_data_path'] = self.lookzoneFileName
 
-    self.configFileName = self.configFileEdit.text()
-    if len(self.configFileName):
+    if len(self.configFileName) and self.saveConfigView.isVisible():
       output_file_paths['config_file_path'] = self.configFileName
 
     self.window.showWriteProgressView(output_file_paths, self.slide_attrs, self.lookzone_attrs)
@@ -161,12 +161,22 @@ class SaveFileWidget(QtGui.QWidget):
     foundError = False
 
     regex_format = re.compile(".*\.xls$")
+
     if len(self.slide_attrs):
       self.slideFileName = self.fileTextEdit.text()
 
       if not len(self.slideFileName) or not regex_format.match(self.slideFileName):
         self.slide_error_msg_label.setText('<b style="color:red">You must select a valid output location for Slide Metrics.</b>')
         foundError = True
+
+      if os.path.isfile(self.slideFileName):
+        file_split = self.slideFileName.split('\\')
+        file_name = file_split[-1]
+        foundError = self.showOverwriteMessage(file_name)
+
+        # If they selected to not overwrite the file, return immediately
+        if foundError:
+          return not foundError
 
     if len(self.lookzone_attrs):
       self.lookzoneFileName = self.lookzoneFileEdit.text()
@@ -175,7 +185,40 @@ class SaveFileWidget(QtGui.QWidget):
         self.lookzone_error_msg_label.setText('<b style="color:red">You must select a valid output location for LookZone Data.</b>')
         foundError = True
 
+      if os.path.isfile(self.lookzoneFileName):
+        file_split = self.lookzoneFileName.split('\\')
+        file_name = file_split[-1]
+        foundError = self.showOverwriteMessage(file_name)
+
+        # If they selected to not overwrite the file, return immediately
+        if foundError:
+          return not foundError
+
+    self.configFileName = self.configFileEdit.text()
+
+    if self.saveConfigView.isVisible() and len(self.configFileName):
+      if os.path.isfile(self.configFileName):
+        file_split = self.configFileName.split('\\')
+        file_name = file_split[-1]
+        foundError = self.showOverwriteMessage(file_name)
+
+        # If they selected to not overwrite the file, return immediately
+        if foundError:
+          return not foundError
+
     return not foundError
+
+  # Show error message for file already saved in that location
+  def showOverwriteMessage(self, file_name):
+    message = file_name + ' Already exists in this location, do you want to overwrite it?'
+    reply = QtGui.QMessageBox.question(self, 'Message',
+      message, QtGui.QMessageBox.Yes |
+      QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+
+    if reply == QtGui.QMessageBox.No:
+      return True
+    else:
+      return False
 
   # go to next view to select data attributes
   def switchViews(self):

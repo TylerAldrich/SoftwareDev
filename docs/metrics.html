@@ -1,0 +1,98 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module metrics</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>metrics</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/JohnKohler/Documents/Northeastern/Academic/JuniorYear/Software Development/SoftwareDev/metrics.py">/Users/JohnKohler/Documents/Northeastern/Academic/JuniorYear/Software Development/SoftwareDev/metrics.py</a></font></td></tr></table>
+    <p></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="pprint.html">pprint</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="metrics.html#Metrics">Metrics</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="metrics.html#Lookzone">Lookzone</a>
+</font></dt><dt><font face="helvetica, arial"><a href="metrics.html#Slidemetrics">Slidemetrics</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Lookzone">class <strong>Lookzone</strong></a>(<a href="metrics.html#Metrics">Metrics</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Describes&nbsp;a&nbsp;<a href="#Lookzone">Lookzone</a><br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Lookzone-__init__"><strong>__init__</strong></a>(self, name)</dt></dl>
+
+<hr>
+Methods inherited from <a href="metrics.html#Metrics">Metrics</a>:<br>
+<dl><dt><a name="Lookzone-add_value_for_attribute"><strong>add_value_for_attribute</strong></a>(self, value, attr)</dt></dl>
+
+<dl><dt><a name="Lookzone-has_attribute"><strong>has_attribute</strong></a>(self, attr)</dt></dl>
+
+<dl><dt><a name="Lookzone-value_for_attribute"><strong>value_for_attribute</strong></a>(self, attr)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Metrics">class <strong>Metrics</strong></a></font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Metrics-__init__"><strong>__init__</strong></a>(self, name)</dt><dd><tt><a href="#Metrics">Metrics</a>&nbsp;serves&nbsp;as&nbsp;a&nbsp;parent&nbsp;to&nbsp;both&nbsp;<a href="#Lookzone">Lookzone</a>&nbsp;and&nbsp;<a href="#Slidemetrics">Slidemetrics</a>,<br>
+and&nbsp;is&nbsp;used&nbsp;to&nbsp;store&nbsp;attribute&nbsp;data&nbsp;for&nbsp;input&nbsp;workbooks.<br>
+&nbsp;<br>
+<a href="#Lookzone">Lookzone</a>&nbsp;and&nbsp;<a href="#Slidemetrics">Slidemetrics</a>&nbsp;add&nbsp;no&nbsp;functionality&nbsp;but&nbsp;are&nbsp;named<br>
+to&nbsp;make&nbsp;their&nbsp;purpose&nbsp;more&nbsp;clear&nbsp;in&nbsp;the&nbsp;WorkbookReader&nbsp;class.</tt></dd></dl>
+
+<dl><dt><a name="Metrics-add_value_for_attribute"><strong>add_value_for_attribute</strong></a>(self, value, attr)</dt></dl>
+
+<dl><dt><a name="Metrics-has_attribute"><strong>has_attribute</strong></a>(self, attr)</dt></dl>
+
+<dl><dt><a name="Metrics-value_for_attribute"><strong>value_for_attribute</strong></a>(self, attr)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Slidemetrics">class <strong>Slidemetrics</strong></a>(<a href="metrics.html#Metrics">Metrics</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Describes&nbsp;a&nbsp;Slidemetric<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Slidemetrics-__init__"><strong>__init__</strong></a>(self, name)</dt></dl>
+
+<hr>
+Methods inherited from <a href="metrics.html#Metrics">Metrics</a>:<br>
+<dl><dt><a name="Slidemetrics-add_value_for_attribute"><strong>add_value_for_attribute</strong></a>(self, value, attr)</dt></dl>
+
+<dl><dt><a name="Slidemetrics-has_attribute"><strong>has_attribute</strong></a>(self, attr)</dt></dl>
+
+<dl><dt><a name="Slidemetrics-value_for_attribute"><strong>value_for_attribute</strong></a>(self, attr)</dt></dl>
+
+</td></tr></table></td></tr></table>
+</body></html>
