@@ -158,6 +158,17 @@ class LoadFileWidget(QtGui.QWidget):
     select_dialog = QtGui.QFileDialog(self)
     select_dialog.setFileMode(QtGui.QFileDialog.AnyFile)
     files = map(str, select_dialog.getOpenFileNames())
+
+    # make sure all of these files are proper excel files
+    bad_files = []
+    for file_path in files:
+      if 'xls' not in file_path:
+        # show error and don't add it
+        self.error_msg_label.setText('File is not an excel file')
+        bad_files.append(file_path)
+   # remove any bad files
+    for file_path in bad_files:
+      files.remove(file_path)
     return files
 
   # Method to update the view of all the files
