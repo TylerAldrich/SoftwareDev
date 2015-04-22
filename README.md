@@ -1,6 +1,14 @@
 # SoftwareDev
 Software Development Project
 
+# How to use this software!
+On Windows : Download ipatch.exe and click run! No dependencies necessary.
+
+To run iPatch manually, clone this repo. The repo contains the xls loading and saving libraries.
+The only dependency necessary is PyQT4, which can be found here: http://www.riverbankcomputing.com/software/pyqt/download
+
+After PyQT4 is installed, issuing the command 'python ipatch.py' in the repo directory will run our program.
+
 # Create git repo locally
 Step 1: Add ssh key to github https://help.github.com/articles/generating-ssh-keys/
 
