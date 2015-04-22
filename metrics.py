@@ -22,10 +22,12 @@ class Metrics():
         return self.data.get(attr) != None
 
 class Lookzone(Metrics):
+    """ Describes a Lookzone """
     def __init__(self, name):
         Metrics.__init__(self, name)
 
 
 class Slidemetrics(Metrics):
+    """ Describes a Slidemetric """
     def __init__(self, name):
         Metrics.__init__(self, name)
