@@ -17,6 +17,7 @@ class FilePathWidget(QtGui.QWidget):
     layout = QtGui.QHBoxLayout(self)
 
     remove_button = QtGui.QPushButton('Remove')
+    remove_button.setCursor(QtCore.Qt.PointingHandCursor)
     layout.addWidget(remove_button)
     remove_button.clicked.connect(self.removeFile)
 
