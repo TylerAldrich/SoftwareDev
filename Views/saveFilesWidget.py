@@ -147,7 +147,6 @@ class SaveFileWidget(QtGui.QWidget):
     if len(self.lookzone_attrs):
       output_file_paths['lookzone_data_path'] = self.lookzoneFileName
 
-    self.configFileName = self.configFileEdit.text()
     if len(self.configFileName) and self.saveConfigView.isVisible():
       output_file_paths['config_file_path'] = self.configFileName
 
@@ -162,6 +161,7 @@ class SaveFileWidget(QtGui.QWidget):
     foundError = False
 
     regex_format = re.compile(".*\.xls$")
+
     if len(self.slide_attrs):
       self.slideFileName = self.fileTextEdit.text()
 
@@ -187,6 +187,18 @@ class SaveFileWidget(QtGui.QWidget):
 
       if os.path.isfile(self.lookzoneFileName):
         file_split = self.lookzoneFileName.split('\\')
+        file_name = file_split[-1]
+        foundError = self.showOverwriteMessage(file_name)
+
+        # If they selected to not overwrite the file, return immediately
+        if foundError:
+          return not foundError
+
+    self.configFileName = self.configFileEdit.text()
+
+    if self.saveConfigView.isVisible() and len(self.configFileName):
+      if os.path.isfile(self.configFileName):
+        file_split = self.configFileName.split('\\')
         file_name = file_split[-1]
         foundError = self.showOverwriteMessage(file_name)
 
